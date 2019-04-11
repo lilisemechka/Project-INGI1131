@@ -9,9 +9,11 @@ define
    StartPlayer
    TreatStream
    Name = 'namefordebug'
+
+   %Attributes
    PlayerID
    SpawnPos
-
+   PlayerState
 in
    fun{StartPlayer ID}
       Stream Port OutputStream      
@@ -32,8 +34,12 @@ in
       %% TODO complete
       case Stream of nil then skip
       [] getId(ID) then ID = PlayerID
+      [] getState(ID State) then 
+         ID = PlayerID
+         State = PlayerState
       [] assignSpawn(Pos) then SpawnPos = Pos
       [] spawn(ID Pos) then 
+         PlayerState = on
          ID = PlayerID
          Pos = SpawnPos
       end

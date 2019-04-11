@@ -3,7 +3,6 @@ import
    GUI
    Input
    PlayerManager
-   Browser
 define
    P_GUI
    
@@ -16,6 +15,9 @@ define
    AssignSpawns %Proc
 
    SpawnPlayers %Proc
+
+   HandleBombs
+   DoActionTBT
 in
    %% Create MAP
    P_GUI = {GUI.portWindow}
@@ -92,5 +94,54 @@ in
    end
 
    {SpawnPlayers Players}
+
+
+   fun{HandleBombs Bombs}
+      case Bombs 
+      of nil then nil
+      [] H|T then
+         case H of bomb(pos:Pos timer:TicTac) then
+            local NewTicTac = TicTac -1
+            in
+               if NewTicTac == 0 then
+                  {Send P_GUI hideBomb(Pos)}
+                  {Send P_GUI spawnFire(Pos)}
+                  bomb(pos:Pos timer:NewTicTac)|{HandleBombs T}
+               elseif NewTicTac == ~1 then 
+                  {Send P_GUI hideFire(Pos)}
+                  {HandleBombs T}
+               else
+                  bomb(pos:Pos timer:NewTicTac)|{HandleBombs T}
+               end
+            end
+         end
+      end
+   end
+
+
+   proc{DoActionTBT PlayersList Bombs}      
+      {Delay 2000}
+      case PlayersList 
+      of nil then {DoActionTBT Players Bombs}
+      [] H|T then
+         local 
+            ID
+            Action 
+         in
+            {Send H doaction(ID Action)}
+            case Action 
+            of move(Pos) then 
+               {Send P_GUI movePlayer(ID Pos)}
+               {DoActionTBT T {HandleBombs Bombs}}
+            [] bomb(Pos) then 
+               {Send P_GUI spawnBomb(Pos)}
+               {DoActionTBT T bomb(pos:Pos timer:3*Input.nbBombers)|{HandleBombs Bombs}}
+            end
+            
+         end         
+      end      
+   end
+
+   {DoActionTBT Players nil}
 
 end
