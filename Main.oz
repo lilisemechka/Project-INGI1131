@@ -16,6 +16,8 @@ define
 
    SpawnPlayers %Proc
 
+   ExploLoc
+   Explode
    HandleBombs
    DoActionTBT
 in
@@ -96,6 +98,60 @@ in
    {SpawnPlayers Players}
 
 
+
+   proc{ExploLoc Pos Action Direction Acc}
+      if Acc == Input.fire then
+         skip
+      else      
+         local 
+            Type
+         in
+            if (Pos.y < 1) orelse (Pos.y > Input.nbRow) orelse (Pos.x < 1) orelse (Pos.x > Input.nbColumn) then
+               skip
+            else
+               Type =  {Nth {Nth Input.map Pos.y} Pos.x}
+               if Type \= 1 then
+                  case Action
+                  of spawnFire then               
+                     {Send P_GUI spawnFire(Pos)}
+                     if Type == 2 orelse Type == 3 then
+                        {Send P_GUI hideBox(Pos)}
+                        for E in Players do
+                           {Send E info(boxRemoved(Pos))}
+                        end
+                     else
+                        case Direction
+                        of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1} 
+                        [] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1}
+                        [] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1}
+                        [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1}
+                        end
+                     end
+                  [] hideFire then
+                     {Send P_GUI hideFire(Pos)}
+                     case Direction
+                     of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1} 
+                     [] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1}
+                     [] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1}
+                     [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1}
+                     end
+                  end
+               end
+            end
+         end
+      end
+   end
+
+   proc{Explode Pos Action}
+      case Pos of pt(x:X y:Y) then
+         {ExploLoc pt(x:X-1 y:Y) Action west 1}
+         {ExploLoc pt(x:X+1 y:Y) Action east 1}
+         {ExploLoc pt(x:X y:Y-1) Action south 1}
+         {ExploLoc pt(x:X y:Y+1) Action north 1}         
+      end
+   end
+
+
    fun{HandleBombs Bombs}
       case Bombs 
       of nil then nil
@@ -106,9 +162,11 @@ in
                if NewTicTac == 0 then
                   {Send P_GUI hideBomb(Pos)}
                   {Send P_GUI spawnFire(Pos)}
+                  {Explode Pos spawnFire}
                   bomb(pos:Pos timer:NewTicTac)|{HandleBombs T}
                elseif NewTicTac == ~1 then 
                   {Send P_GUI hideFire(Pos)}
+                  {Explode Pos hideFire}
                   {HandleBombs T}
                else
                   bomb(pos:Pos timer:NewTicTac)|{HandleBombs T}
@@ -120,7 +178,7 @@ in
 
 
    proc{DoActionTBT PlayersList Bombs}      
-      {Delay 2000}
+      {Delay 500}
       case PlayersList 
       of nil then {DoActionTBT Players Bombs}
       [] H|T then
@@ -142,6 +200,8 @@ in
       end      
    end
 
+   {Delay 2000}
    {DoActionTBT Players nil}
+   
 
 end
