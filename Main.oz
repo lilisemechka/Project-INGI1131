@@ -38,6 +38,8 @@ in
 	    elseif X == 1 then
 	       if Type == point then 5|T
 	       elseif Type == bonus then 6|T
+	       elseif Type == deletePoint then 0|T
+	       elseif Type == deleteBonus then 0|T
 	       end
 	    end
 	 end
@@ -250,11 +252,21 @@ in
 	    Action
 	    NewMap
 	    NewIntMap
+	    Type
          in
             {Send H doaction(ID Action)}
             case Action 
             of move(Pos) then 
 	       {Send P_GUI movePlayer(ID Pos)}
+	       Type =  {Nth {Nth Map Pos.y} Pos.x}
+	       if Type == 2 then
+		  {Send P_GUI hidePoint(Pos)}
+		  {DoActionTBT T {HandleBombs Bombs Map NewIntMap NewMap} {ChangeMap Map Pos deletePoint}}
+	       elseif Type == 3 then
+		  {Send P_GUI hideBonus(Pos)}
+		  {DoActionTBT T {HandleBombs Bombs Map NewIntMap NewMap} {ChangeMap Map Pos deleteBonus}}
+	       else {DoActionTBT T {HandleBombs Bombs Map NewIntMap NewMap} Map}
+	       end
 	       {DoActionTBT T {HandleBombs Bombs Map NewIntMap NewMap} NewMap}
             [] bomb(Pos) then 
 	       {Send P_GUI spawnBomb(Pos)}
