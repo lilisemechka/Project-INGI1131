@@ -167,16 +167,17 @@ in
 		  [] hideFire then
 		     local NewMap1 in
 			{Send P_GUI hideFire(Pos)}
-			NewMap1 = {ChangeMap Map Pos hide}
 			case Direction
-			of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1 NewMap1 NewMap}
-			[] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1 NewMap1 NewMap}
-			[] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 NewMap1 NewMap}
-			[] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 NewMap1 NewMap}
+			of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1 Map NewMap}
+			[] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1 Map NewMap}
+			[] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 Map NewMap}
+			[] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 Map NewMap}
 			end
 		     end
 		     
-                  end
+		  end
+	       else
+		  NewMap = Map
                end
             end
          end
