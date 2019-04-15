@@ -6,7 +6,7 @@ import
    Browser
 define
    P_GUI
-   
+
    Initialize %First : function
    Players %Second : List
    ChangeMap
@@ -29,8 +29,9 @@ in
    %Change MAP 
    fun {ChangeMap Map Pos Type}
       {Browser.browse 'changemap'}
-   
+
       fun{NewMap Map X Y}
+
 	 case Map of H|T then
 	    if Y > 1 then H|{NewMap T X Y-1}
 	    elseif Y == 1 then {NewMap H X 0}|T
@@ -47,22 +48,27 @@ in
    in
       case Pos of pt(x:X y:Y) then
 	 {NewMap Map X Y}
+
       end
+      in
+         case Pos of pt(x:X y:Y) then
+            {NewMap Map X Y}
+         end
    end
-   
+
 
    %% Initializing all players and creating one port / player
    fun{Initialize N Names Colors Acc}
       if N > 0 then
-	     local 
-        NewPlayer
-        in
-	        NewPlayer = bomber(id:Acc name:Names.1 color:Colors.1)
-	        {Send P_GUI initPlayer(NewPlayer)}
-	        {PlayerManager.playerGenerator NewPlayer.name NewPlayer}|{Initialize N-1 Names.2 Colors.2 Acc+1}
-	     end
+         local 
+            NewPlayer
+         in
+            NewPlayer = bomber(id:Acc name:Names.1 color:Colors.1)
+            {Send P_GUI initPlayer(NewPlayer)}
+            {PlayerManager.playerGenerator NewPlayer.name NewPlayer}|{Initialize N-1 Names.2 Colors.2 Acc+1}
+         end
       else
-        nil
+         nil
       end
    end   
    Players = {Initialize Input.nbBombers Input.bombers Input.colorsBombers 1}
@@ -126,14 +132,14 @@ in
    proc{ExploLoc Pos Action Direction Acc Map NewMap}
       {Browser.browse 'exploloc'}
       if Acc == Input.fire then
-	 NewMap = Map
+         NewMap = Map
          skip
       else      
          local 
             Type
          in
-	    if (Pos.y < 1) orelse (Pos.y > Input.nbRow) orelse (Pos.x < 1) orelse (Pos.x > Input.nbColumn) then
-	       NewMap = Map
+            if (Pos.y < 1) orelse (Pos.y > Input.nbRow) orelse (Pos.x < 1) orelse (Pos.x > Input.nbColumn) then
+               NewMap = Map
                skip
             else
                Type =  {Nth {Nth Map Pos.y} Pos.x}
@@ -141,24 +147,24 @@ in
                   case Action
                   of spawnFire then               
                      {Send P_GUI spawnFire(Pos)}
-		     if Type == 2 orelse Type == 3 then
-			{Send P_GUI hideBox(Pos)}
-			if Type == 2 then
-			   {Browser.browse 'type2'}
-			   NewMap = {ChangeMap Map Pos point}
-			   {Browser.browse NewMap}
-			   {Send P_GUI spawnPoint(Pos)}
-			   {Browser.browse 'TYPE2'}
-			else NewMap = {ChangeMap Map Pos bonus}
-			   {Browser.browse 'TYPE3'}
-			   {Send P_GUI spawnBonus(Pos)}
-			   {Browser.browse NewMap}
-			   {Browser.browse 'TYPE3'}
-			end
-			for E in Players do
+                     if Type == 2 orelse Type == 3 then
+                        {Send P_GUI hideBox(Pos)}
+                        if Type == 2 then
+                           {Browser.browse 'type2'}
+                           NewMap = {ChangeMap Map Pos point}
+                           {Browser.browse NewMap}
+                           {Send P_GUI spawnPoint(Pos)}
+                           {Browser.browse 'TYPE2'}
+                        else NewMap = {ChangeMap Map Pos bonus}
+                           {Browser.browse 'TYPE3'}
+                           {Send P_GUI spawnBonus(Pos)}
+                           {Browser.browse NewMap}
+                           {Browser.browse 'TYPE3'}
+                        end
+                        for E in Players do
                            {Send E info(boxRemoved(Pos))}
                         end
-		     else
+                     else
                         case Direction
                         of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1 Map NewMap} 
                         [] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1 Map NewMap}
@@ -166,20 +172,19 @@ in
                         [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 Map NewMap}
                         end
                      end
-		  [] hideFire then
-		     local NewMap1 in
-			{Send P_GUI hideFire(Pos)}
-			case Direction
-			of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1 Map NewMap}
-			[] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1 Map NewMap}
-			[] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 Map NewMap}
-			[] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 Map NewMap}
-			end
-		     end
-		     
-		  end
-	       else
-		  NewMap = Map
+                  [] hideFire then
+                     local NewMap1 in
+                        {Send P_GUI hideFire(Pos)}
+                        case Direction
+                        of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1 Map NewMap}
+                        [] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1 Map NewMap}
+                        [] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 Map NewMap}
+                        [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 Map NewMap}
+                        end
+                     end
+                  end
+               else
+                  NewMap = Map
                end
             end
          end
@@ -189,49 +194,47 @@ in
 
    proc{Explode Pos Action Map NewMap}
       NewMap1 NewMap2 NewMap3 NewMap4
-   in
-      {Browser.browse 'explode'}
-      case Pos of pt(x:X y:Y) then
-	 {ExploLoc pt(x:X-1 y:Y) Action west 1 Map NewMap1}
+      in
+         {Browser.browse 'explode'}
+         case Pos of pt(x:X y:Y) then
+         {ExploLoc pt(x:X-1 y:Y) Action west 1 Map NewMap1}
 
-	 {ExploLoc pt(x:X+1 y:Y) Action east 1 NewMap1 NewMap2}
+         {ExploLoc pt(x:X+1 y:Y) Action east 1 NewMap1 NewMap2}
 
-	 {ExploLoc pt(x:X y:Y-1) Action south 1 NewMap2 NewMap3}
+         {ExploLoc pt(x:X y:Y-1) Action south 1 NewMap2 NewMap3}
 
-	 {ExploLoc pt(x:X y:Y+1) Action north 1 NewMap3 NewMap4}
-	 
-	 NewMap = NewMap4
+         {ExploLoc pt(x:X y:Y+1) Action north 1 NewMap3 NewMap4}
+
+         NewMap = NewMap4
       end
    end
-   
+
 
 
    fun{HandleBombs Bombs Map NewIntMap NewMap}
       {Browser.browse 'handleBombs'}
       case Bombs 
       of nil then
-	 case NewIntMap of _ then NewMap = Map
-	 else NewMap = NewIntMap
-	 end
-	 nil
+         NewMap = NewIntMap
+         nil
       [] H|T then
          case H of bomb(pos:Pos timer:TicTac) then
-	    local
-	       NewTicTac = TicTac -1
+            local
+            NewTicTac = TicTac -1
             in
                if NewTicTac == 0 then
                   {Send P_GUI hideBomb(Pos)}
-		  {Send P_GUI spawnFire(Pos)}
-		  {Explode Pos spawnFire Map NewIntMap}
-		  local NewIntMap1 in
-		     bomb(pos:Pos timer:NewTicTac)|{HandleBombs T NewIntMap NewIntMap1 NewMap}
-		  end
+                  {Send P_GUI spawnFire(Pos)}
+                  {Explode Pos spawnFire Map NewIntMap}
+                  local NewIntMap1 in
+                     bomb(pos:Pos timer:NewTicTac)|{HandleBombs T NewIntMap NewIntMap1 NewMap}
+                  end
                elseif NewTicTac == ~1 then 
                   {Send P_GUI hideFire(Pos)}
-		  {Explode Pos hideFire Map NewMap}
-		  local NewIntMap1 in
-		     {HandleBombs T NewIntMap NewIntMap1 NewMap}
-		  end
+                  {Explode Pos hideFire Map NewMap}
+                  local NewIntMap1 in
+                     {HandleBombs T NewIntMap NewIntMap1 NewMap}
+                  end
                else
                   bomb(pos:Pos timer:NewTicTac)|{HandleBombs T Map NewIntMap NewMap}
                end
@@ -253,6 +256,7 @@ in
 	    NewMap
 	    NewIntMap
 	    Type
+
          in
             {Send H doaction(ID Action)}
             case Action 
@@ -269,14 +273,14 @@ in
 	       end
 	       {DoActionTBT T {HandleBombs Bombs Map NewIntMap NewMap} NewMap}
             [] bomb(Pos) then 
-	       {Send P_GUI spawnBomb(Pos)}
-	       {DoActionTBT T bomb(pos:Pos timer:3*Input.nbBombers)|{HandleBombs Bombs Map NewIntMap NewMap} NewMap}
-	    end
-	 end         
+               {Send P_GUI spawnBomb(Pos)}
+               {DoActionTBT T bomb(pos:Pos timer:3*Input.nbBombers)|{HandleBombs Bombs Map NewIntMap NewMap} NewMap}
+            end
+         end         
       end      
    end
 
    {Delay 2000}
    {DoActionTBT Players nil Input.map}
-   
+
 end
