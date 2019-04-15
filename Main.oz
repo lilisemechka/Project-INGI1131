@@ -32,28 +32,24 @@ in
 
       fun{NewMap Map X Y}
 
-	 case Map of H|T then
-	    if Y > 1 then H|{NewMap T X Y-1}
-	    elseif Y == 1 then {NewMap H X 0}|T
-	    elseif X > 1 then H|{NewMap T X-1 0}
-	    elseif X == 1 then
-	       if Type == point then 5|T
-	       elseif Type == bonus then 6|T
-	       elseif Type == deletePoint then 0|T
-	       elseif Type == deleteBonus then 0|T
-	       end
-	    end
-	 end
+      	 case Map of H|T then
+      	    if Y > 1 then H|{NewMap T X Y-1}
+      	    elseif Y == 1 then {NewMap H X 0}|T
+      	    elseif X > 1 then H|{NewMap T X-1 0}
+      	    elseif X == 1 then
+      	       if Type == point then 5|T
+      	       elseif Type == bonus then 6|T
+      	       elseif Type == deletePoint then 0|T
+      	       elseif Type == deleteBonus then 0|T
+      	       end
+      	    end
+      	 end
       end
    in
       case Pos of pt(x:X y:Y) then
-	 {NewMap Map X Y}
+	  {NewMap Map X Y}
 
-      end
-      in
-         case Pos of pt(x:X y:Y) then
-            {NewMap Map X Y}
-         end
+      end      
    end
 
 
@@ -193,7 +189,7 @@ in
    end
 
    proc{Explode Pos Action Map NewMap}
-      NewMap1 NewMap2 NewMap3 NewMap4
+      NewMap1 NewMap2 NewMap3
       in
          {Browser.browse 'explode'}
          case Pos of pt(x:X y:Y) then
@@ -203,40 +199,38 @@ in
 
          {ExploLoc pt(x:X y:Y-1) Action south 1 NewMap2 NewMap3}
 
-         {ExploLoc pt(x:X y:Y+1) Action north 1 NewMap3 NewMap4}
-
-         NewMap = NewMap4
+         {ExploLoc pt(x:X y:Y+1) Action north 1 NewMap3 NewMap}
       end
    end
 
 
 
-   fun{HandleBombs Bombs Map NewIntMap NewMap}
+   fun{HandleBombs Bombs Map NewMap}
       {Browser.browse 'handleBombs'}
       case Bombs 
       of nil then
-         NewMap = NewIntMap
+         NewMap = Map
          nil
       [] H|T then
          case H of bomb(pos:Pos timer:TicTac) then
             local
             NewTicTac = TicTac -1
+            NewIntMap
             in
                if NewTicTac == 0 then
                   {Send P_GUI hideBomb(Pos)}
                   {Send P_GUI spawnFire(Pos)}
                   {Explode Pos spawnFire Map NewIntMap}
                   local NewIntMap1 in
-                     bomb(pos:Pos timer:NewTicTac)|{HandleBombs T NewIntMap NewIntMap1 NewMap}
+                     bomb(pos:Pos timer:NewTicTac)|{HandleBombs T NewIntMap NewMap}
                   end
                elseif NewTicTac == ~1 then 
                   {Send P_GUI hideFire(Pos)}
-                  {Explode Pos hideFire Map NewMap}
-                  local NewIntMap1 in
-                     {HandleBombs T NewIntMap NewIntMap1 NewMap}
-                  end
+                  {Explode Pos hideFire Map NewIntMap}
+                  {HandleBombs T NewIntMap NewMap}                  
                else
-                  bomb(pos:Pos timer:NewTicTac)|{HandleBombs T Map NewIntMap NewMap}
+                  NewIntMap = Map
+                  bomb(pos:Pos timer:NewTicTac)|{HandleBombs T NewIntMap NewMap}  
                end
             end
          end
@@ -252,29 +246,30 @@ in
       [] H|T then
          local 
             ID
-	    Action
-	    NewMap
-	    NewIntMap
-	    Type
-
+      	     Action
+      	    NewMap
+      	    NewIntMap
+      	    Type
          in
             {Send H doaction(ID Action)}
             case Action 
             of move(Pos) then 
+            
 	       {Send P_GUI movePlayer(ID Pos)}
 	       Type =  {Nth {Nth Map Pos.y} Pos.x}
-	       if Type == 2 then
+	       if Type == 5 then
 		  {Send P_GUI hidePoint(Pos)}
-		  {DoActionTBT T {HandleBombs Bombs Map NewIntMap NewMap} {ChangeMap Map Pos deletePoint}}
-	       elseif Type == 3 then
+		  {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
+	       elseif Type == 6 then
 		  {Send P_GUI hideBonus(Pos)}
-		  {DoActionTBT T {HandleBombs Bombs Map NewIntMap NewMap} {ChangeMap Map Pos deleteBonus}}
-	       else {DoActionTBT T {HandleBombs Bombs Map NewIntMap NewMap} Map}
+		  {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}
+	       else 
+          {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
 	       end
-	       {DoActionTBT T {HandleBombs Bombs Map NewIntMap NewMap} NewMap}
+	       {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
             [] bomb(Pos) then 
                {Send P_GUI spawnBomb(Pos)}
-               {DoActionTBT T bomb(pos:Pos timer:3*Input.nbBombers)|{HandleBombs Bombs Map NewIntMap NewMap} NewMap}
+               {DoActionTBT T bomb(pos:Pos timer:3*Input.nbBombers)|{HandleBombs Bombs Map NewMap} NewMap}
             end
          end         
       end      
