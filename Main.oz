@@ -412,7 +412,12 @@ in
                      if ({OS.rand} mod 2 ) == 0 then
             		      {Send H.port add(bomb 1)}
                      else
-                        {Send H.port add(point 10)}
+                        local 
+                           Score 
+                        in
+                          {Send H.port add(point 10 Score)}
+                          {Send P_GUI scoreUpdate(ID Score)}
+                        end
                      end
             		   {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap PlayersList} {ChangeMap NewMap Pos deleteBonus}}                   
    	            else 
