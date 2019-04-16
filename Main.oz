@@ -151,47 +151,47 @@ in
                if Type \= 1 then
                   case Action
                   of spawnFire then               
-		     {Send P_GUI spawnFire(Pos)}
+		                {Send P_GUI spawnFire(Pos)}
                      if Type == 2 orelse Type == 3 then
                         {Send P_GUI hideBox(Pos)}
                         if Type == 2 then
                            NewMap = {ChangeMap Map Pos pointAndFire}
                            {Send P_GUI spawnPoint(Pos)}
-			else
-			   NewMap = {ChangeMap Map Pos bonusAndFire}
+			               else
+			                  NewMap = {ChangeMap Map Pos bonusAndFire}
                            {Send P_GUI spawnBonus(Pos)}
                         end
                         for E in Players do
                            {Send E info(boxRemoved(Pos))}
                         end
-		     else
-			local NewMap1 in
-			   NewMap1 = {ChangeMap Map Pos fire}
-			   case Direction
-			   of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1 NewMap1 NewMap}
-			   [] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1 NewMap1 NewMap}
-			   [] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 NewMap1 NewMap}
-			   [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 NewMap1 NewMap}
-			   end
-			end
+		                else
+               			local NewMap1 in
+               			   NewMap1 = {ChangeMap Map Pos fire}
+               			   case Direction
+               			   of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1 NewMap1 NewMap}
+               			   [] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1 NewMap1 NewMap}
+               			   [] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 NewMap1 NewMap}
+               			   [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 NewMap1 NewMap}
+               			   end
+               			end
                      end
                   [] hideFire then
-			local NewMap1
-			in
-			   if Type == 12 then NewMap1 = {ChangeMap Map Pos deleteFireP}
-			   elseif Type == 13 then NewMap1 = {ChangeMap Map Pos deleteFireB}
-			   else NewMap1 = {ChangeMap Map Pos deleteFire}
-			   end
-			   {Send P_GUI hideFire(Pos)}
-			   case Direction
-			   of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1 NewMap1 NewMap}
-			   [] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1 NewMap1 NewMap}
-			   [] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 NewMap1 NewMap}
-			   [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 NewMap1 NewMap}
-			   end
-			end
-		  end
-	       else
+            			local NewMap1
+            			in
+            			   if Type == 12 then NewMap1 = {ChangeMap Map Pos deleteFireP}
+            			   elseif Type == 13 then NewMap1 = {ChangeMap Map Pos deleteFireB}
+            			   else NewMap1 = {ChangeMap Map Pos deleteFire}
+            			   end
+            			   {Send P_GUI hideFire(Pos)}
+            			   case Direction
+            			   of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1 NewMap1 NewMap}
+            			   [] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1 NewMap1 NewMap}
+            			   [] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 NewMap1 NewMap}
+            			   [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 NewMap1 NewMap}
+            			   end
+            			end
+		             end
+	           else
                   NewMap = Map
                end
             end
