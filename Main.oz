@@ -4,6 +4,7 @@ import
    Input
    PlayerManager
    Browser
+   OS
 define
    P_GUI
 
@@ -368,9 +369,13 @@ in
          		     {Send P_GUI scoreUpdate(ID Score)}
          		  end
 	             {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
-              elseif Type == 6 then
-         		  {Send P_GUI hideBonus(Pos)}
-         		  {Send H.port add(bomb 1)}
+               elseif Type == 6 then
+         		   {Send P_GUI hideBonus(Pos)}
+                  if {OS.rand} mod 2 == 0 then
+         		      {Send H.port add(bomb 1)}
+                  else
+                     {Send H.port add(point 10)}
+                  end
          		  {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}                   
 	           else 
                   {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap} NewMap}                  
