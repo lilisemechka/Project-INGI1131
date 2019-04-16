@@ -84,19 +84,19 @@ in
       end
    end
    
-   %%Return true if there are some boxes on the map false otherwise
+   %%Return true if there are no more boxes on the map false otherwise
    fun{BoxCheck Map}
       case Map
       of H|T then
 	     case H of nil then {BoxCheck T}
 	     [] H1|T1 then
-	        if H1 == 2 then true
-	        elseif H1 == 3 then true
+	        if H1 == 2 then false
+	        elseif H1 == 3 then false
 	        else
 	           {BoxCheck T1|T}
 	        end
 	     end
-      [] nil then false
+      [] nil then true
       end
    end
 
@@ -119,18 +119,18 @@ in
 
 
    %% Identifying spawn positions
-   fun{BoxCheck Map}
+   fun{FindSpawns Map Y X}
       case Map
       of H|T then
-	 case H of nil then {BoxCheck T}
-	 [] H1|T1 then
-	    if H1 == 2 then true
-	    elseif H1 == 3 then true
-	    else
-	       {BoxCheck T1|T}
-	    end
-	 end
-      [] nil then false
+   	 case H of nil then {FindSpawns T Y+1 1}
+   	 [] H1|T1 then
+   	    if H1 == 4 then 
+            pt(x:X y:Y)|{FindSpawns T1|T Y X+1}
+   	    else
+   	       {FindSpawns T1|T Y X+1}
+   	    end
+   	 end
+      [] nil then nil
       end
    end
 
@@ -349,82 +349,88 @@ in
       {Browser.browse 'doaction'}
       {Delay 500}
       {Browser.browse PlayersList}
-      case PlayersList 
-      of H|nil then          
+      if {BoxCheck Map} then 
          {Send P_GUI displayWinner({BestScore})}
          {Delay 10000}
          skip
-      [] nil then
-         {Send P_GUI displayWinner({BestScore})}
-         {Delay 10000}
-         skip
-      [] H|T then
-         local 
-            ID
-   	      Action
-      	   NewMap
-      	   Type
-         in            
-            {Send H.port doaction(ID Action)}
-            local IDState State in
-               {Send H.port getState(IDState State)}
-               {Browser.browse State}
-               if State == off then 
-                  local 
-                     IDSpawn 
-                     PosSpawn 
-                  in
-                     {Send H.port spawn(IDSpawn PosSpawn)}
-                     case PosSpawn of pt(x:X y:Y) then
-                        {Send P_GUI spawnPlayer(IDSpawn PosSpawn)}
-                        {DoActionTBT {Append T player(port:H.port pos:PosSpawn)|nil} Bombs Map}  
-                     else
-                        for Ps in PlayersList do
-                           {Send Ps.port info(deadPlayer(IDSpawn))}
-                        end
-                        {DoActionTBT T Bombs Map}  
-                     end
-                                
-                  end
-               end
-            end               
-            case Action 
-            of move(Pos) then            
-              {Send P_GUI movePlayer(ID Pos)}
-              for E in PlayersList do
-	             {Send E.port info(movePlayer(ID Pos))}
-              end
-              Type =  {Nth {Nth Map Pos.y} Pos.x}
-	            if Type == 5 then
-	              {Send P_GUI hidePoint(Pos)}
-         		  local Score in
-         		     {Send H.port add(point 1 Score)}
-         		     {Send P_GUI scoreUpdate(ID Score)}
-         		  end
-	              {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap PlayersList} {ChangeMap NewMap Pos deletePoint}}
-               elseif Type == 6 then
-         		   {Send P_GUI hideBonus(Pos)}
-                  if ({OS.rand} mod 2 ) == 0 then
-         		      {Send H.port add(bomb 1)}
-                  else
-                     {Send H.port add(point 10)}
-                  end
-         		   {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap PlayersList} {ChangeMap NewMap Pos deleteBonus}}                   
-	            else 
-                  {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap PlayersList} NewMap}                  
-	            end
-            [] bomb(Pos) then                
-               {Send P_GUI spawnBomb(Pos)}
-               for E in PlayersList do
-	               {Send E.port info(bombPlanted(Pos))}
-               end
-               {DoActionTBT {Append T H|nil} bomb(pos:Pos timer:3*Input.nbBombers port:H.port)|{HandleBombs Bombs Map NewMap PlayersList} NewMap}
-            else
-               {Browser.browse Action} 
-            end                 
-         end
       else
-         {Browser.browse 'No Players left'}
+         case PlayersList 
+         of H|nil then          
+            {Send P_GUI displayWinner({BestScore})}
+            {Delay 10000}
+            skip
+         [] nil then
+            {Send P_GUI displayWinner({BestScore})}
+            {Delay 10000}
+            skip
+         [] H|T then
+            local 
+               ID
+      	      Action
+         	   NewMap
+         	   Type
+            in            
+               {Send H.port doaction(ID Action)}
+               local IDState State in
+                  {Send H.port getState(IDState State)}
+                  {Browser.browse State}
+                  if State == off then 
+                     local 
+                        IDSpawn 
+                        PosSpawn 
+                     in
+                        {Send H.port spawn(IDSpawn PosSpawn)}
+                        case PosSpawn of pt(x:X y:Y) then
+                           {Send P_GUI spawnPlayer(IDSpawn PosSpawn)}
+                           {DoActionTBT {Append T player(port:H.port pos:PosSpawn)|nil} Bombs Map}  
+                        else
+                           for Ps in PlayersList do
+                              {Send Ps.port info(deadPlayer(IDSpawn))}
+                           end
+                           {DoActionTBT T Bombs Map}  
+                        end
+                                   
+                     end
+                  end
+               end               
+               case Action 
+               of move(Pos) then            
+                 {Send P_GUI movePlayer(ID Pos)}
+                 for E in PlayersList do
+   	             {Send E.port info(movePlayer(ID Pos))}
+                 end
+                 Type =  {Nth {Nth Map Pos.y} Pos.x}
+   	            if Type == 5 then
+   	              {Send P_GUI hidePoint(Pos)}
+            		  local Score in
+            		     {Send H.port add(point 1 Score)}
+            		     {Send P_GUI scoreUpdate(ID Score)}
+            		  end
+   	              {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap PlayersList} {ChangeMap NewMap Pos deletePoint}}
+                  elseif Type == 6 then
+            		   {Send P_GUI hideBonus(Pos)}
+                     if ({OS.rand} mod 2 ) == 0 then
+            		      {Send H.port add(bomb 1)}
+                     else
+                        {Send H.port add(point 10)}
+                     end
+            		   {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap PlayersList} {ChangeMap NewMap Pos deleteBonus}}                   
+   	            else 
+                     {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap PlayersList} NewMap}                  
+   	            end
+               [] bomb(Pos) then                
+                  {Send P_GUI spawnBomb(Pos)}
+                  for E in PlayersList do
+   	               {Send E.port info(bombPlanted(Pos))}
+                  end
+                  {DoActionTBT {Append T H|nil} bomb(pos:Pos timer:3*Input.nbBombers port:H.port)|{HandleBombs Bombs Map NewMap PlayersList} NewMap}
+               else
+                  {Browser.browse Action} 
+               end                 
+            end
+         else
+            {Browser.browse 'No Players left'}
+         end
       end
    end     
 
