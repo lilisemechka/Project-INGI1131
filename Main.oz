@@ -82,7 +82,20 @@ in
       end
    end
    
-   
+   %%Return true if there are some boxes on the map false otherwise
+   fun{BoxCheck Map}
+      case Map
+      of H|T then
+	 case H of nil then {BoxCheck T}
+	 [] H1|T1 then
+	    if H1 == 2 then true
+	    elseif H1 == 3 then true
+	    else
+	       {BoxCheck T1|T}
+	    end
+	 end
+      [] nil then false
+   end
 
    %% Initializing all players and creating one port / player
    fun{Initialize N Names Colors Acc}
@@ -103,18 +116,18 @@ in
 
 
    %% Identifying spawn positions
-   fun{FindSpawns Map Y X}
-      case Map 
+   fun{BoxCheck Map}
+      case Map
       of H|T then
-         case H of nil then {FindSpawns T Y+1 1}
-         [] H1|T1 then
-            if H1 == 4 then
-               pt(x:X y:Y)|{FindSpawns T1|T Y X+1}
-            else
-               {FindSpawns T1|T Y X+1}
-            end
-         end
-      [] nil then nil
+	 case H of nil then {BoxCheck T}
+	 [] H1|T1 then
+	    if H1 == 2 then true
+	    elseif H1 == 3 then true
+	    else
+	       {BoxCheck T1|T}
+	    end
+	 end
+      [] nil then false
       end
    end
 
