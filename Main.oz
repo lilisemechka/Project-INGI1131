@@ -219,36 +219,41 @@ in
 
          {ExploLoc pt(x:X y:Y+1) Action north 1 NewMap3 NewMap}
       end
+      {Browser.browse 'REAL QUIT EXPLODE'}
    end
 
 
 
    fun{HandleBombs Bombs Map NewMap}
       {Browser.browse 'handleBombs'}
-
       case Bombs 
       of nil then
          NewMap = Map
          nil
       [] H|T then
-         case H of bomb(pos:Pos timer:TicTac) then
+         case H of bomb(pos:Pos timer:TicTac port:P) then
             local
             NewTicTac = TicTac -1
             NewIntMap
             in
-               if NewTicTac == 0 then
+               if TicTac == 0 then
+                  local NbBombs in
+                  {Send P add(bomb 1 NbBombs)}
+                  {Browser.browse NbBombs}
+                  {Delay 5000}
+                  end
                   {Send P_GUI hideBomb(Pos)}
                   {Send P_GUI spawnFire(Pos)}
-                  {Explode Pos spawnFire Map NewIntMap}                  
-                  bomb(pos:Pos timer:NewTicTac)|{HandleBombs T NewIntMap NewMap}
+                  {Explode Pos spawnFire {ChangeMap Map Pos fire} NewIntMap}                  
+                  bomb(pos:Pos timer:NewTicTac port:P)|{HandleBombs T NewIntMap NewMap}
                   
-               elseif NewTicTac == ~1 then 
+               elseif TicTac == ~1 then 
                   {Send P_GUI hideFire(Pos)}
-                  {Explode Pos hideFire Map NewIntMap}
+                  {Explode Pos hideFire {ChangeMap Map Pos deleteFire} NewIntMap}
                   {HandleBombs T NewIntMap NewMap}                  
                else
                   NewIntMap = Map
-                  bomb(pos:Pos timer:NewTicTac)|{HandleBombs T NewIntMap NewMap}  
+                  bomb(pos:Pos timer:NewTicTac port:P)|{HandleBombs T NewIntMap NewMap}  
                end
             end
          end
@@ -258,160 +263,81 @@ in
 
    proc{DoActionTBT PlayersList Bombs Map}
       {Browser.browse 'doation'}
-      {Browser.browse Map}
-      {Delay 1500}
+      {Delay 500}
       case PlayersList 
       of nil then {DoActionTBT Players Bombs Map}
       [] H|T then
-         local 
-            ID
-      	     Action
-      	    NewMap
-      	    NewIntMap
-      	    Type
-         in
-            {Send H doaction(ID Action)}
-            case Action 
-            of move(Pos) then 
-            
-	       {Send P_GUI movePlayer(ID Pos)}
-	       for E in Players do
-		  {Send E info(movePlayer(ID Pos))}
-	       end
-
-	       Type =  {Nth {Nth Map Pos.y} Pos.x}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-              {Browser.browse Type}
-
-   	       if Type == 5 then
-		  {Send P_GUI hidePoint(Pos)}
-		  local Score in
-		     {Send H add(point 1 Score)}
-		     {Send P_GUI scoreUpdate(ID Score)}
-		  end
-		  {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
-	       elseif Type == 6 then
-		  {Send P_GUI hideBonus(Pos)}
-		  {Send H add(bomb 1)}
-		  {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}
-               elseif Type == 7 then
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  local 
-                     IDead
-                     Lives
-                  in
-                     {Send H gotHit(IDead Lives)}
-                     case Lives of death(NewLife) then
-                        {Send P_GUI lifeUpdate(IDead NewLife)}
+         local IDState State in
+            {Send H getState(IDState State)}
+            if State == off then 
+               local IDSpawn PosSpawn in
+                  {Send H spawn(IDSpawn PosSpawn)}
+                  {Send P_GUI spawnPlayer(IDSpawn PosSpawn)}
+                  {DoActionTBT T Bombs Map}             
+               end
+            end
+            local 
+               ID
+      	      Action
+         	   NewMap
+         	   NewIntMap
+         	   Type
+            in
+               {Send H doaction(ID Action)}
+               case Action 
+               of move(Pos) then            
+	              {Send P_GUI movePlayer(ID Pos)}
+	              for E in Players do
+		             {Send E info(movePlayer(ID Pos))}
+	              end
+                 Type =  {Nth {Nth Map Pos.y} Pos.x}
+   	           if Type == 5 then
+		             {Send P_GUI hidePoint(Pos)}
+            		  local Score in
+            		     {Send H add(point 1 Score)}
+            		     {Send P_GUI scoreUpdate(ID Score)}
+            		  end
+		             {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
+	              elseif Type == 6 then
+            		  {Send P_GUI hideBonus(Pos)}
+            		  {Send H add(bomb 1)}
+            		  {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}
+                  elseif Type == 7 orelse Type == 12 orelse Type == 13 then
+                     local 
+                        IDead
+                        Lives
+                     in
+                        {Send P_GUI hidePlayer(ID)}
+                        {Send H gotHit(IDead Lives)}
+                        case Lives of death(NewLife) then
+                           {Send P_GUI lifeUpdate(IDead NewLife)}
+                        end
                      end
-                  end
+                     if Type == 7 then
+                        {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
+                     elseif Type == 12 then
+                        {Send P_GUI hidePoint(Pos)}
+                        local Score in
+                           {Send H add(point 1 Score)}
+                           {Send P_GUI scoreUpdate(ID Score)}
+                        end
+                        {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
+                     elseif Type == 13 then
+                        {Send P_GUI hideBonus(Pos)}
+                        {Send H add(bomb 1)}
+                        {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}
+                     end               
+   	           else 
                   {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
-               elseif Type == 12 then
-               {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  local 
-                     IDead
-                     Lives
-                  in
-                     {Send H gotHit(IDead Lives)}
-                     case Lives of death(NewLife) then
-                        {Send P_GUI lifeUpdate(IDead NewLife)}
-                     end
-                  end
-                  {Send P_GUI hidePoint(Pos)}
-                  local Score in
-                     {Send H add(point 1 Score)}
-                     {Send P_GUI scoreUpdate(ID Score)}
-                  end
-                  {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
-               elseif Type == 13 then
-               {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  {Browser.browse 'FIIIIRE'}
-                  local 
-                     IDead
-                     Lives
-                  in
-                     {Send H gotHit(IDead Lives)}
-                     case Lives of death(NewLife) then
-                        {Send P_GUI lifeUpdate(IDead NewLife)}
-                     end
-                  end
-                  {Send P_GUI hideBonus(Pos)}
-                  {Send H add(bomb 1)}
-                  {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}
-   	       else 
-               {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
-   	       end
-   	        {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
-            [] bomb(Pos) then 
-	       {Send P_GUI spawnBomb(Pos)}
-	       for E in Players do
-		  {Send E info(bombPlanted(Pos))}
-	       end
-               {DoActionTBT T bomb(pos:Pos timer:3*Input.nbBombers)|{HandleBombs Bombs Map NewMap} NewMap}
+   	           end
+   	           {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
+               [] bomb(Pos) then 
+	              {Send P_GUI spawnBomb(Pos)}
+	               for E in Players do
+		               {Send E info(bombPlanted(Pos))}
+	               end
+                  {DoActionTBT T bomb(pos:Pos timer:3*Input.nbBombers port:H)|{HandleBombs Bombs Map NewMap} NewMap}
+               end
             end
          end         
       end      
