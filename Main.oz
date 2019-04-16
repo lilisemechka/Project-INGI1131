@@ -123,7 +123,7 @@ in
             {Send H spawn(IDPlayer PosPlayer)}
 	    {Send P_GUI spawnPlayer(IDPlayer PosPlayer)}
 	    for E in Players do
-	       {Send E info(IDPlayer PosPlayer)}
+	       {Send E info(spawnPlayer(IDPlayer PosPlayer))}
 	    end
             {SpawnPlayers T}
          end
@@ -268,8 +268,12 @@ in
             case Action 
             of move(Pos) then 
             
-	           {Send P_GUI movePlayer(ID Pos)}
-	           Type =  {Nth {Nth Map Pos.y} Pos.x}
+	       {Send P_GUI movePlayer(ID Pos)}
+	       for E in Players do
+		  {Send E info(movePlayer(ID Pos))}
+	       end
+
+	       Type =  {Nth {Nth Map Pos.y} Pos.x}
               {Browser.browse Type}
               {Browser.browse Type}
               {Browser.browse Type}
@@ -288,16 +292,16 @@ in
               {Browser.browse Type}
 
    	       if Type == 5 then
-   		       {Send P_GUI hidePoint(Pos)}
-               local Score in
-                  {Send H add(point 1 Score)}
-                  {Send P_GUI scoreUpdate(ID Score)}
-               end
-   		       {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
-   	       elseif Type == 6 then
-   		       {Send P_GUI hideBonus(Pos)}
-               {Send H add(bomb 1)}
-   		       {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}
+		  {Send P_GUI hidePoint(Pos)}
+		  local Score in
+		     {Send H add(point 1 Score)}
+		     {Send P_GUI scoreUpdate(ID Score)}
+		  end
+		  {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
+	       elseif Type == 6 then
+		  {Send P_GUI hideBonus(Pos)}
+		  {Send H add(bomb 1)}
+		  {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}
                elseif Type == 7 then
                   {Browser.browse 'FIIIIRE'}
                   {Browser.browse 'FIIIIRE'}
@@ -397,7 +401,10 @@ in
    	       end
    	        {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
             [] bomb(Pos) then 
-               {Send P_GUI spawnBomb(Pos)}
+	       {Send P_GUI spawnBomb(Pos)}
+	       for E in Players do
+		  {Send E info(bombPlanted(Pos))}
+	       end
                {DoActionTBT T bomb(pos:Pos timer:3*Input.nbBombers)|{HandleBombs Bombs Map NewMap} NewMap}
             end
          end         
