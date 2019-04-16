@@ -203,7 +203,7 @@ in
    proc{Explode Pos Action Map NewMap}
       NewMap1 NewMap2 NewMap3
    in
-      case Action of spawnFire then
+      if(Action == spawnFire) then
 	 for E in Players do
 	    {Send E info(bombExploded(Pos))}
 	 end
