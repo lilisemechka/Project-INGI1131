@@ -278,6 +278,7 @@ in
                         {Send P_GUI lifeUpdate(IDead NewLife)}
                      end
                   end
+                  {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
    	       else 
                {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
    	       end
