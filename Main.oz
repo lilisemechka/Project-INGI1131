@@ -264,18 +264,33 @@ in
             case Action 
             of move(Pos) then 
             
-	       {Send P_GUI movePlayer(ID Pos)}
-	       Type =  {Nth {Nth Map Pos.y} Pos.x}
-	       if Type == 5 then
-		  {Send P_GUI hidePoint(Pos)}
-		  {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
-	       elseif Type == 6 then
-		  {Send P_GUI hideBonus(Pos)}
-		  {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}
-	       else 
-          {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
-	       end
-	       {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
+	           {Send P_GUI movePlayer(ID Pos)}
+	           Type =  {Nth {Nth Map Pos.y} Pos.x}
+   	       if Type == 5 then
+   		       {Send P_GUI hidePoint(Pos)}
+               local Score in
+                  {Send H add(point 1 Score)}
+                  {Send P_GUI scoreUpdate(H Score)}
+               end
+   		       {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
+   	       elseif Type == 6 then
+   		       {Send P_GUI hideBonus(Pos)}
+               {Send H add(bomb 1)}
+   		       {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}
+               elseif Type == 7 then
+                  local 
+                     IDead
+                     Lives
+                  in
+                     {Send H gotHit(IDead Lives)}
+                     case Lives of death(NewLife) then
+                        {Send P_GUI lifeUpdate(IDead NewLife)}
+                     end
+                  end
+   	       else 
+               {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
+   	       end
+   	        {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
             [] bomb(Pos) then 
                {Send P_GUI spawnBomb(Pos)}
                {DoActionTBT T bomb(pos:Pos timer:3*Input.nbBombers)|{HandleBombs Bombs Map NewMap} NewMap}
