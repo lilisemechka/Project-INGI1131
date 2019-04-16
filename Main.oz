@@ -316,17 +316,14 @@ in
       {Delay 500}
       {Browser.browse PlayersList}
       case PlayersList 
-      of H|nil then 
-         local 
-            ID
-         in
-            {Send H.port getId(ID)}
-            {Wait ID}
-            {Browser.browse ID}            
-            {Send P_GUI displayWinner(ID)}
-            {Delay 10000}
-            skip
-         end
+      of H|nil then          
+         {Send P_GUI displayWinner({BestScore})}
+         {Delay 10000}
+         skip
+      [] nil then
+         {Send P_GUI displayWinner({BestScore})}
+         {Delay 10000}
+         skip
       [] H|T then
          local 
             ID
@@ -384,7 +381,7 @@ in
                for E in PlayersList do
 	               {Send E.port info(bombPlanted(Pos))}
                end
-               {DoActionTBT {Append T H|nil} bomb(pos:Pos timer:3*Input.nbBombers port:H.port)|{HandleBombs Bombs Map NewMap} NewMap}
+               {DoActionTBT {Append T H|nil} bomb(pos:Pos timer:Input.TimingBomb*Input.nbBombers port:H.port)|{HandleBombs Bombs Map NewMap} NewMap}
             else
                {Browser.browse Action} 
             end                 
