@@ -121,7 +121,10 @@ in
             IDPlayer PosPlayer
          in
             {Send H spawn(IDPlayer PosPlayer)}
-            {Send P_GUI spawnPlayer(IDPlayer PosPlayer)}
+	    {Send P_GUI spawnPlayer(IDPlayer PosPlayer)}
+	    for E in Players do
+	       {Send E info(IDPlayer PosPlayer)}
+	    end
             {SpawnPlayers T}
          end
       end
