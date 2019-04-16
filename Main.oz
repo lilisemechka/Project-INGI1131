@@ -7,8 +7,9 @@ import
 define
    P_GUI
 
-   Initialize %First : function
-   Players %Second : List
+   Initialize 
+   PortPlayers
+   Players 
    ChangeMap
 
    FindSpawns
@@ -38,15 +39,15 @@ in
       	    elseif X > 1 then H|{NewMap T X-1 0}
       	    elseif X == 1 then
       	       if Type == point then 5|T
-	       elseif Type == bonus then 6|T
-	       elseif Type == pointAndFire then 12|T
-	       elseif Type == bonusAndFire then 13|T
-	       elseif Type == fire then 7|T
-	       elseif Type == deletePoint then 0|T
-	       elseif Type == deleteBonus then 0|T
-	       elseif Type == deleteFire then 0|T
-	       elseif Type == deleteFireP then 5|T
-	       elseif Type == deleteFireB then 6|T
+      	       elseif Type == bonus then 6|T
+      	       elseif Type == pointAndFire then 12|T
+      	       elseif Type == bonusAndFire then 13|T
+      	       elseif Type == fire then 7|T
+      	       elseif Type == deletePoint then 0|T
+      	       elseif Type == deleteBonus then 0|T
+      	       elseif Type == deleteFire then 0|T
+      	       elseif Type == deleteFireP then 5|T
+      	       elseif Type == deleteFireB then 6|T
       	       end
       	    end
       	 end
@@ -73,7 +74,7 @@ in
          nil
       end
    end   
-   Players = {Initialize Input.nbBombers Input.bombers Input.colorsBombers 1}
+   PortPlayers = {Initialize Input.nbBombers Input.bombers Input.colorsBombers 1}
 
 
 
@@ -97,40 +98,42 @@ in
 
    %%Assign spawn position to each player
 
-   proc{AssignSpawns Players AvailSpawns}
-      case Players of nil then skip
-      [] H|T then         
-         {Send H assignSpawn(AvailSpawns.1)}
-         if AvailSpawns.2 == nil then
-            {AssignSpawns Players.2 Spawns}
-         else
-            {AssignSpawns Players.2 AvailSpawns.2}
+   fun{AssignSpawns Players AvailSpawns}
+      local ActualSpawns
+      in
+         if AvailSpawns == nil then ActualSpawns = Spawns
+         else ActualSpawns = AvailSpawns
          end
+         case Players of nil then nil
+         [] H|T then         
+            {Send H assignSpawn(AvailSpawns.1)}            
+            player(port:H pos:AvailSpawns.1)|{AssignSpawns Players.2 AvailSpawns.2}
+         end         
       end
    end  
 
-   {AssignSpawns Players Spawns} 
+   Players = {AssignSpawns PortPlayers Spawns} 
 
 
    %% Spawn the players who should be spawned
 
-   proc{SpawnPlayers Players} 
-      case Players of nil then skip
+   proc{SpawnPlayers PortPlayers} 
+      case PortPlayers of nil then skip
       [] H|T then
          local 
             IDPlayer PosPlayer
          in
             {Send H spawn(IDPlayer PosPlayer)}
-	    {Send P_GUI spawnPlayer(IDPlayer PosPlayer)}
+	        {Send P_GUI spawnPlayer(IDPlayer PosPlayer)}
 	    for E in Players do
-	       {Send E info(spawnPlayer(IDPlayer PosPlayer))}
+	       {Send E.port info(spawnPlayer(IDPlayer PosPlayer))}
 	    end
             {SpawnPlayers T}
          end
       end
    end
 
-   {SpawnPlayers Players}
+   {SpawnPlayers PortPlayers}
 
 
 
@@ -152,13 +155,26 @@ in
                   case Action
                   of spawnFire then               
 		                {Send P_GUI spawnFire(Pos)}
+                      for E in Players do
+                        case E.pos of pt(x:X y:Y) then
+                           if X==Pos.x andthen Y==Pos.y then
+                              local 
+                                 IDead
+                                 Lives
+                              in
+                                 {Send E.port gotHit(IDead Lives)}
+                                 {Send P_GUI hidePlayer(IDead)}                                 
+                                 case Lives of death(NewLife) then
+                                    {Send P_GUI lifeUpdate(IDead NewLife)}
+                                 else
+                                    skip
+                                 end
+                              end
+                           end
+                        end
+                     end
                      if Type == 2 orelse Type == 3 then
-                        {Browser.browse Map}
-                        {Delay 7000}
                         {Send P_GUI hideBox(Pos)}
-                        {Browser.browse 'HIDEN'}
-                        {Browser.browse Pos}
-                        {Delay 5000}
                         if Type == 2 then
                            NewMap = {ChangeMap Map Pos pointAndFire}
                            {Send P_GUI spawnPoint(Pos)}
@@ -167,33 +183,40 @@ in
                            {Send P_GUI spawnBonus(Pos)}
                         end
                         for E in Players do
-                           {Send E info(boxRemoved(Pos))}
+                           {Send E.port info(boxRemoved(Pos))}
                         end
+                        skip
 		                else
                			local NewMap1 in
                			   NewMap1 = {ChangeMap Map Pos fire}
                			   case Direction
-               			   of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1 NewMap1 NewMap}
-               			   [] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1 NewMap1 NewMap}
+               			   of north then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action north Acc+1 NewMap1 NewMap}
+               			   [] south then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action south Acc+1 NewMap1 NewMap}
                			   [] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 NewMap1 NewMap}
                			   [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 NewMap1 NewMap}
                			   end
                			end
+                        skip
                      end
                   [] hideFire then
             			local NewMap1
             			in
-            			   if Type == 12 then NewMap1 = {ChangeMap Map Pos deleteFireP}
-            			   elseif Type == 13 then NewMap1 = {ChangeMap Map Pos deleteFireB}
-            			   else NewMap1 = {ChangeMap Map Pos deleteFire}
-            			   end
-            			   {Send P_GUI hideFire(Pos)}
-            			   case Direction
-            			   of north then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action north Acc+1 NewMap1 NewMap}
-            			   [] south then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action south Acc+1 NewMap1 NewMap}
-            			   [] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 NewMap1 NewMap}
-            			   [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 NewMap1 NewMap}
-            			   end
+            			   if Type == 12 then 
+                           NewMap = {ChangeMap Map Pos deleteFireP}
+                           {Send P_GUI hideFire(Pos)}
+            			   elseif Type == 13 then 
+                           NewMap = {ChangeMap Map Pos deleteFireB}
+                           {Send P_GUI hideFire(Pos)}
+            			   else 
+                           NewMap1 = {ChangeMap Map Pos deleteFire}            			   
+               			   {Send P_GUI hideFire(Pos)}
+               			   case Direction
+               			   of north then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action north Acc+1 NewMap1 NewMap}
+               			   [] south then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action south Acc+1 NewMap1 NewMap}
+               			   [] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 NewMap1 NewMap}
+               			   [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 NewMap1 NewMap}
+               			   end
+                        end
             			end
 		             end
 	           else
@@ -210,7 +233,7 @@ in
    in
       if(Action == spawnFire) then
 	 for E in Players do
-	    {Send E info(bombExploded(Pos))}
+	    {Send E.port info(bombExploded(Pos))}
 	 end
       end
       
@@ -220,9 +243,9 @@ in
 
          {ExploLoc pt(x:X+1 y:Y) Action east 0 NewMap1 NewMap2}
 
-         {ExploLoc pt(x:X y:Y-1) Action south 0 NewMap2 NewMap3}
+         {ExploLoc pt(x:X y:Y+1) Action south 0 NewMap2 NewMap3}
 
-         {ExploLoc pt(x:X y:Y+1) Action north 0 NewMap3 NewMap}
+         {ExploLoc pt(x:X y:Y-1) Action north 0 NewMap3 NewMap}
       end
       {Browser.browse 'REAL QUIT EXPLODE'}
    end
@@ -250,8 +273,6 @@ in
                elseif TicTac == ~1 then 
                   local NbBombs in
                      {Send P add(bomb 1 NbBombs)}
-                     {Browser.browse NbBombs}
-                     {Delay 5000}
                   end
                   {Send P_GUI hideFire(Pos)}
                   {Explode Pos hideFire {ChangeMap Map Pos deleteFire} NewIntMap}
@@ -269,111 +290,87 @@ in
    proc{DoActionTBT PlayersList Bombs Map}
       {Browser.browse 'doaction'}
       {Delay 500}
+      {Browser.browse PlayersList}
       case PlayersList 
-      of nil then {DoActionTBT Players Bombs Map}
+      of H|nil then 
+         local 
+            ID
+         in
+            {Send H.port getId(ID)}
+            {Wait ID}
+            {Browser.browse ID}            
+            {Send P_GUI displayWinner(ID)}
+            {Delay 10000}
+            skip
+         end
       [] H|T then
          local 
             ID
    	      Action
       	   NewMap
-      	   NewIntMap
       	   Type
          in            
-            {Send H doaction(ID Action)}
+            {Send H.port doaction(ID Action)}
             local IDState State in
-               {Send H getState(IDState State)}
+               {Send H.port getState(IDState State)}
                {Browser.browse State}
                if State == off then 
                   local 
                      IDSpawn 
                      PosSpawn 
                   in
-                     {Send H spawn(IDSpawn PosSpawn)}
+                     {Send H.port spawn(IDSpawn PosSpawn)}
                      case PosSpawn of pt(x:X y:Y) then
                         {Send P_GUI spawnPlayer(IDSpawn PosSpawn)}
+                        {DoActionTBT {Append T player(port:H.port pos:PosSpawn)|nil} Bombs Map}  
                      else
-                        for Ps in Players do
-                           {Send Ps info(deadPlayer(ID))}
+                        for Ps in PlayersList do
+                           {Send Ps.port info(deadPlayer(IDSpawn))}
                         end
+                        {DoActionTBT T Bombs Map}  
                      end
-                     {DoActionTBT T Bombs Map}             
+                                
                   end
                end
             end               
             case Action 
             of move(Pos) then            
               {Send P_GUI movePlayer(ID Pos)}
-              for E in Players do
-	             {Send E info(movePlayer(ID Pos))}
+              for E in PlayersList do
+	             {Send E.port info(movePlayer(ID Pos))}
               end
               Type =  {Nth {Nth Map Pos.y} Pos.x}
 	           if Type == 5 then
 	             {Send P_GUI hidePoint(Pos)}
          		  local Score in
-         		     {Send H add(point 1 Score)}
+         		     {Send H.port add(point 1 Score)}
          		     {Send P_GUI scoreUpdate(ID Score)}
          		  end
-	             {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
+	             {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
               elseif Type == 6 then
          		  {Send P_GUI hideBonus(Pos)}
-         		  {Send H add(bomb 1)}
-         		  {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}
-               elseif Type == 7 orelse Type == 12 orelse Type == 13 then
-                  local 
-                     IDead
-                     Lives
-                  in
-                     {Send P_GUI hidePlayer(ID)}
-                     {Send H gotHit(IDead Lives)}
-                     case Lives of death(NewLife) then
-                        {Send P_GUI lifeUpdate(IDead NewLife)}
-                     end
-                  end
-                  if Type == 7 then
-                     {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
-                  elseif Type == 12 then
-                     {Send P_GUI hidePoint(Pos)}
-                     local Score in
-                        {Send H add(point 1 Score)}
-                        {Send P_GUI scoreUpdate(ID Score)}
-                     end
-                     {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deletePoint}}
-                  elseif Type == 13 then
-                     {Send P_GUI hideBonus(Pos)}
-                     {Send H add(bomb 1)}
-                     {DoActionTBT T {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}
-                  end               
+         		  {Send H.port add(bomb 1)}
+         		  {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap} {ChangeMap NewMap Pos deleteBonus}}                   
 	           else 
-                  {Browser.browse 'Timetohandle'}
-                  {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}                  
+                  {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap} NewMap}                  
 	           end
-	           {DoActionTBT T {HandleBombs Bombs Map NewMap} NewMap}
-            [] bomb(Pos) then 
-               Type =  {Nth {Nth Map Pos.y} Pos.x}
-               if Type == 7 then
-                  local 
-                     IDead
-                     Lives
-                  in
-                     {Send P_GUI hidePlayer(ID)}
-                     {Send H gotHit(IDead Lives)}
-                     case Lives of death(NewLife) then
-                        {Send P_GUI lifeUpdate(IDead NewLife)}
-                     end
-                  end
-               end
+	           {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap} NewMap}
+            [] bomb(Pos) then                
               {Send P_GUI spawnBomb(Pos)}
-               for E in Players do
-	               {Send E info(bombPlanted(Pos))}
+               for E in PlayersList do
+	               {Send E.port info(bombPlanted(Pos))}
                end
-               {DoActionTBT T bomb(pos:Pos timer:3*Input.nbBombers port:H)|{HandleBombs Bombs Map NewMap} NewMap}
-            end
+               {DoActionTBT {Append T H|nil} bomb(pos:Pos timer:3*Input.nbBombers port:H.port)|{HandleBombs Bombs Map NewMap} NewMap}
+            else
+               {Browser.browse Action} 
+            end                 
          end
-      end         
-   end      
-   
+      else
+         {Browser.browse 'No Players left'}
+      end
+   end     
 
-   {Delay 5000}
+   {Delay 7000}
    {DoActionTBT Players nil Input.map}
 
 end
