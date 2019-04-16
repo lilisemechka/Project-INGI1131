@@ -24,6 +24,7 @@ define
    Explode
    HandleBombs
    DoActionTBT
+   BoxCheck
 in
    %% Create MAP
    P_GUI = {GUI.portWindow}
@@ -87,15 +88,16 @@ in
    fun{BoxCheck Map}
       case Map
       of H|T then
-	 case H of nil then {BoxCheck T}
-	 [] H1|T1 then
-	    if H1 == 2 then true
-	    elseif H1 == 3 then true
-	    else
-	       {BoxCheck T1|T}
-	    end
-	 end
+	     case H of nil then {BoxCheck T}
+	     [] H1|T1 then
+	        if H1 == 2 then true
+	        elseif H1 == 3 then true
+	        else
+	           {BoxCheck T1|T}
+	        end
+	     end
       [] nil then false
+      end
    end
 
    %% Initializing all players and creating one port / player
