@@ -381,7 +381,7 @@ in
                for E in PlayersList do
 	               {Send E.port info(bombPlanted(Pos))}
                end
-               {DoActionTBT {Append T H|nil} bomb(pos:Pos timer:Input.TimingBomb*Input.nbBombers port:H.port)|{HandleBombs Bombs Map NewMap} NewMap}
+               {DoActionTBT {Append T H|nil} bomb(pos:Pos timer:Input.timingBomb*Input.nbBombers port:H.port)|{HandleBombs Bombs Map NewMap} NewMap}
             else
                {Browser.browse Action} 
             end                 
