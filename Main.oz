@@ -202,7 +202,13 @@ in
 
    proc{Explode Pos Action Map NewMap}
       NewMap1 NewMap2 NewMap3
-      in
+   in
+      case Action of spawnFire then
+	 for E in Players do
+	    {Send E info(bombExploded(Pos))}
+	 end
+      end
+      
          {Browser.browse 'explode'}
          case Pos of pt(x:X y:Y) then
          {ExploLoc pt(x:X-1 y:Y) Action west 1 Map NewMap1}
