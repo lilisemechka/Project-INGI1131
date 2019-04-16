@@ -40,7 +40,7 @@ in
       	       if Type == point then 5|T
 	       elseif Type == bonus then 6|T
 	       elseif Type == pointAndFire then 12|T
-	       elseif Type == pointAndBonus then 13|T
+	       elseif Type == bonusAndFire then 13|T
 	       elseif Type == fire then 7|T
 	       elseif Type == deletePoint then 0|T
 	       elseif Type == deleteBonus then 0|T
@@ -230,10 +230,9 @@ in
                if NewTicTac == 0 then
                   {Send P_GUI hideBomb(Pos)}
                   {Send P_GUI spawnFire(Pos)}
-                  {Explode Pos spawnFire Map NewIntMap}
-                  local NewIntMap1 in
-                     bomb(pos:Pos timer:NewTicTac)|{HandleBombs T NewIntMap NewMap}
-                  end
+                  {Explode Pos spawnFire Map NewIntMap}                  
+                  bomb(pos:Pos timer:NewTicTac)|{HandleBombs T NewIntMap NewMap}
+                  
                elseif NewTicTac == ~1 then 
                   {Send P_GUI hideFire(Pos)}
                   {Explode Pos hideFire Map NewIntMap}
