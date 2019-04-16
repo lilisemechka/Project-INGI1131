@@ -10,13 +10,14 @@ define
    Initialize 
    PortPlayers
    Players 
-   ChangeMap
 
    FindSpawns
    Spawns   
 
    AssignSpawns %Proc
 
+   ChangeMap
+   BestScore
    SpawnPlayers %Proc
    ExploLoc
    Explode
@@ -59,6 +60,29 @@ in
       end      
    end
 
+   %%Compare and retun the best score
+   fun{BestScore}
+      fun{BestScoreAcc Players AccPt AccId}
+	 case Players of H|T then
+	    local Result ID in 
+	       {Send H.port add(point 0 Result)}
+	       if Result > AccPt then
+		  {Send H.port getId(ID)}
+		  {BestScoreAcc T Result ID}
+	       else
+		  {BestScoreAcc T AccPt AccId}
+	       end
+	    end
+	 [] nil then AccId
+	 end
+      end
+   in
+      local AccId in
+	 {BestScoreAcc Players 0 AccId}
+      end
+   end
+   
+   
 
    %% Initializing all players and creating one port / player
    fun{Initialize N Names Colors Acc}
