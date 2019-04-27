@@ -79,7 +79,7 @@ in
             ID = PlayerID
             NewLife = BombInfo.live-1
             Result = death(NewLife)
-            {AdjoinAt BombInfo live NewLife}
+            {AdjoinAt {AdjoinAt BombInfo state off} live NewLife}
          end
       end
    end   
