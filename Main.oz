@@ -8,6 +8,7 @@ import
    TurnByTurn
    Utilitaries
    Init
+   Simultaneous
 define
    P_GUI
    Players 
@@ -19,8 +20,10 @@ in
 
    Players = {Init.getPlayers P_GUI}   
 
-   {Delay 7000}
-   {Browser.browse 1}
-   {TurnByTurn.doActionTBT Players nil Input.map P_GUI}
-
+   {Delay 5000}
+   if Input.isTurnByTurn then
+      {TurnByTurn.doActionTBT Players nil Input.map P_GUI}
+   else
+      {Simultaneous.launchSimul Players P_GUI}
+   end
 end

@@ -9,6 +9,7 @@ import
    	Main
 export
 	doActionTBT:DoActionTBT
+	handleBombs:HandleBombs
 define
    	ExploLoc
    	Explode
@@ -139,8 +140,8 @@ in
       [] H|T then
          case H of bomb(pos:Pos timer:TicTac port:P) then
             local
-            NewTicTac = TicTac -1
-            NewIntMap
+            	NewTicTac = TicTac -1
+            	NewIntMap
             in
                if TicTac == 0 then
                   {Send P_GUI hideBomb(Pos)}

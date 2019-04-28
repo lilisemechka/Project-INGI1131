@@ -13,7 +13,7 @@ all : clean main
 main : Main.ozf 
 	ozengine Main.ozf
 
-Main.ozf : Main.oz GUI.ozf Input.ozf PlayerManager.ozf Init.ozf Utilitaries.ozf TurnByTurn.ozf
+Main.ozf : Main.oz GUI.ozf Input.ozf PlayerManager.ozf Init.ozf Utilitaries.ozf TurnByTurn.ozf Simultaneous.ozf
 	ozc -c Main.oz
 
 Init.ozf : Init.oz
@@ -25,6 +25,9 @@ Utilitaries.ozf : Utilitaries.oz
 TurnByTurn.ozf : TurnByTurn.oz
 	ozc -c TurnByTurn.oz
 
+Simultaneous.ozf : Simultaneous.oz
+	ozc -c Simultaneous.oz
+
 GUI.ozf : GUI.oz
 	ozc -c GUI.oz
 
@@ -35,7 +38,7 @@ PlayerManager.ozf : PlayerManager.oz
 	ozc -c PlayerManager.oz
 
 clean : 
-	@rm -f Main.ozf GUI.ozf Input.ozf PlayerManager.ozf
+	@rm -f Main.ozf GUI.ozf Input.ozf PlayerManager.ozf Init.ozf Utilitaries.ozf TurnByTurn.ozf Simultaneous.ozf
 
 else
 
@@ -44,7 +47,7 @@ all : clean main
 main : Main.ozf 
 	../../../../Applications/Mozart2.app/Contents/Resources/bin/ozengine Main.ozf
 
-Main.ozf : Main.oz GUI.ozf Input.ozf PlayerManager.ozf Init.ozf Utilitaries.ozf TurnByTurn.ozf
+Main.ozf : Main.oz GUI.ozf Input.ozf PlayerManager.ozf Init.ozf Utilitaries.ozf TurnByTurn.ozf Simultaneous.ozf
 	../../../../Applications/Mozart2.app/Contents/Resources/bin/ozc -c Main.oz
 
 Init.ozf : Init.oz
@@ -56,6 +59,9 @@ Utilitaries.ozf : Utilitaries.oz
 TurnByTurn.ozf : TurnByTurn.oz
 	../../../../Applications/Mozart2.app/Contents/Resources/bin/ozc -c TurnByTurn.oz
 
+Simultaneous.ozf : Simultaneous.oz
+	../../../../Applications/Mozart2.app/Contents/Resources/bin/ozc -c Simultaneous.oz
+
 GUI.ozf : GUI.oz
 	../../../../Applications/Mozart2.app/Contents/Resources/bin/ozc -c GUI.oz
 
@@ -66,6 +72,6 @@ PlayerManager.ozf : PlayerManager.oz
 	../../../../Applications/Mozart2.app/Contents/Resources/bin/ozc -c PlayerManager.oz
 
 clean : 
-	@rm -f Main.ozf GUI.ozf Input.ozf PlayerManager.ozf
+	@rm -f Main.ozf GUI.ozf Input.ozf PlayerManager.ozf Init.ozf Utilitaries.ozf TurnByTurn.ozf Simultaneous.ozf
 
 endif
