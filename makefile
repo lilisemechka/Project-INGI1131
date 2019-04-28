@@ -25,9 +25,6 @@ compile : Main.ozf GUI.ozf PlayerManager.ozf Init.ozf Utilitaries.ozf TurnByTurn
 compilePlayers : Player000name.oz
 	$(ozCompiler) -c Player000name.oz
 
-*.ozf : *.oz
-	$(ozCompiler) -c *.oz
-
 run : Main.ozf 
 	$(ozExecuter) Main.ozf
 
