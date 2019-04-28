@@ -13,8 +13,17 @@ all : clean main
 main : Main.ozf 
 	ozengine Main.ozf
 
-Main.ozf : Main.oz GUI.ozf Input.ozf PlayerManager.ozf
+Main.ozf : Main.oz GUI.ozf Input.ozf PlayerManager.ozf Init.ozf Utilitaries.ozf TurnByTurn.ozf
 	ozc -c Main.oz
+
+Init.ozf : Init.oz
+	ozc -c Init.oz
+
+Utilitaries.ozf : Utilitaries.oz
+	ozc -c Utilitaries.oz
+
+TurnByTurn.ozf : TurnByTurn.oz
+	ozc -c TurnByTurn.oz
 
 GUI.ozf : GUI.oz
 	ozc -c GUI.oz
@@ -35,8 +44,17 @@ all : clean main
 main : Main.ozf 
 	../../../../Applications/Mozart2.app/Contents/Resources/bin/ozengine Main.ozf
 
-Main.ozf : Main.oz GUI.ozf Input.ozf PlayerManager.ozf
+Main.ozf : Main.oz GUI.ozf Input.ozf PlayerManager.ozf Init.ozf Utilitaries.ozf TurnByTurn.ozf
 	../../../../Applications/Mozart2.app/Contents/Resources/bin/ozc -c Main.oz
+
+Init.ozf : Init.oz
+	../../../../Applications/Mozart2.app/Contents/Resources/bin/ozc -c Init.oz
+
+Utilitaries.ozf : Utilitaries.oz
+	../../../../Applications/Mozart2.app/Contents/Resources/bin/ozc -c Utilitaries.oz
+
+TurnByTurn.ozf : TurnByTurn.oz
+	../../../../Applications/Mozart2.app/Contents/Resources/bin/ozc -c TurnByTurn.oz
 
 GUI.ozf : GUI.oz
 	../../../../Applications/Mozart2.app/Contents/Resources/bin/ozc -c GUI.oz
