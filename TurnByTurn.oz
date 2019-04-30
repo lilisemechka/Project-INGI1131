@@ -10,7 +10,6 @@ import
 export
 	doActionTBT:DoActionTBT
 	handleBombs:HandleBombs
-   explode:Explode
 define
    	ExploLoc
    	Explode
