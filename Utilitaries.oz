@@ -60,7 +60,7 @@ in
       	local 
       		AccId 
       	in
-	 		{BestScoreAcc Players 0 AccId}
+	 		{BestScoreAcc Players ~1 AccId}
       	end
    	end
    
