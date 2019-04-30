@@ -10,6 +10,7 @@ import
 export
 	doActionTBT:DoActionTBT
 	handleBombs:HandleBombs
+   explode:Explode
 define
    	ExploLoc
    	Explode
@@ -249,7 +250,9 @@ in
                   elseif Type == 6 then
             		   {Send P_GUI hideBonus(Pos)}
                      if ({OS.rand} mod 2 ) == 0 then
-            		      {Send H.port add(bomb 1)}
+                        Thrash 
+                        in
+            		      {Send H.port add(bomb 1 Thrash)}
                      else
                         local 
                            Score 

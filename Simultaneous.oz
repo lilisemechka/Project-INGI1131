@@ -14,33 +14,55 @@ define
 	LaunchSimul
 in
 	
-   	fun{HandlePort Map TB PlayersList}
+   	fun{HandlePort Map PlayersList P_GUI}
       	local
          	S
          	R = {NewPort S}
       	in
-         	thread TB = {TreatBombs S nil nil Map 0 PlayersList} end
+         	thread {TreatBombs S Map PlayersList P_GUI} end
          	R
       	end
    	end
 
-   	fun{TreatBombs Stream Bombs Players Map PlayersPlayed PlayersList}
+   	proc{TreatBombs Stream Map PlayersList P_GUI}
       	case Stream 
       	of nil then nil
       	[] H|T then 
          	case H
          	of addBomb(B) then 
-         		{TreatBombs T B|Bombs Players Map PlayersPlayed PlayersList}
-         	[] addPlayer(Player) then
-         		{TreatBombs T Bombs Player|Players Map PlayersPlayed PlayersList}
-         	[] changeMap(type:Type pos:Pos) then
-         		{TreatBombs T Bombs Players {Utilitaries.changeMap Map Pos Type} PlayersPlayed PlayersList}
-         	[] played then
-         		if PlayersPlayed + 1 == {Length PlayersList} then
-         			[Bombs Players Map]
-         		else 
-         			{TreatBombs T Bombs Players Map PlayersPlayed+1 PlayersList}
+         		local
+         			NewIntMap
+         			RandTime = Input.timingBombMin + {OS.rand} mod (Input.timingBombMax - Input.timingBombMin)
+         		in
+         			thread 
+         				{Delay RandTime}
+         				{Send P_GUI hideBomb(Pos)}
+                  		{Send P_GUI spawnFire(Pos)}
+	                  	for E in Players do
+	                     	case E.pos of pt(x:X y:Y) then
+	                        if X==Pos.x andthen Y==Pos.y then
+	                           	local 
+	                              	IDead
+	                              	Lives
+	                           	in
+	                              	{Send E.port gotHit(IDead Lives)}
+	                              	{Send P_GUI hidePlayer(IDead)}                                 
+	                              	case Lives of death(NewLife) then
+	                                 	{Send P_GUI lifeUpdate(IDead NewLife)}
+	                              	else
+	                                 	skip
+	                              	end
+	                           	end
+	                        end
+	                    end
+                  	end
+                  	{TurnByTurn.explode Pos spawnFire {Utilitaries.changeMap Map Pos fire} NewIntMap Players P_GUI}   
+         			{TreatBombs T NewIntMap PlayersList P_GUI}
          		end
+         	[] addPlayer(Player) then
+         		{TreatBombs T Map PlayersList P_GUI}
+         	[] changeMap(type:Type pos:Pos) then
+         		{TreatBombs T {Utilitaries.changeMap Map Pos Type} PlayersList P_GUI}
         	end
         end
     end
@@ -77,6 +99,7 @@ in
 		         case Action 
 		         of move(Pos) then            
 		            {Send P_GUI movePlayer(ID Pos)}
+		            {Send PBombs movePlayer(player(port:H.port pos:Pos))}
 		            for E in PlayersList do
 		               {Send E.port info(movePlayer(ID Pos))}
 		            end
@@ -89,7 +112,6 @@ in
 		                  	{Send H.port add(point 1 Score)}
 		                  	{Send P_GUI scoreUpdate(ID Score)}
 		               	end
-		               	{Send PBombs addPlayer(player(port:H.port pos:Pos))}
 		               	{Send PBombs changeMap(type:deletePoint pos:Pos)}
 		            elseif Type == 6 then
 		               	{Send P_GUI hideBonus(Pos)}
@@ -102,25 +124,20 @@ in
 		                     	{Send H.port add(point 10 Score)}
 		                     	{Send P_GUI scoreUpdate(ID Score)}
 		                  	end
-		               	end 
-		               	{Send PBombs addPlayer(player(port:H.port pos:Pos))} 
-		               	{Send PBombs changeMap(type:deleteBonus pos:Pos)}                  
-		            else 
-		            	{Send PBombs addPlayer(player(port:H.port pos:Pos))}		            	
+		               	end  
+		               	{Send PBombs changeMap(type:deleteBonus pos:Pos)}     		            	
 		            end
 		        [] bomb(Pos) then                
 		            {Send P_GUI spawnBomb(Pos)}
 		            for E in PlayersList do
 		               	{Send E.port info(bombPlanted(Pos))}
 		            end
-		            {Send PBombs addPlayer(H)}
-		            {Send PBombs addBomb(bomb(pos:Pos timer:Input.timingBomb port:H.port))}
+		            {Send PBombs addBomb(bomb(pos:Pos port:H.port))}
 		        else
 		            {Browser.browse Action} 
 		        end
 		    end                 
 	    end
-	    {Send PBombs played}
    	end
    	
 
