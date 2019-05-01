@@ -38,7 +38,7 @@ in
       end
       {NewPort Stream Port}
       thread
-	     {TreatStream OutputStream bombInfo(id:ID state:off pos:nil live:Input.nbLives spawn:nil nBomb:Input.nbBombs point:0 listPlayer:nil map:Input.map bomb:nil bonus:nil) }
+	     {TreatStream OutputStream bombInfo(id:ID state:off pos:nil live:Input.nbLives spawn:nil nBomb:Input.nbBombs point:0 listPlayer:nil map:Input.map bomb:nil bonus:nil bonusPath:pt(x:0 y:0))}
       end
       Port
    end
@@ -151,6 +151,7 @@ in
    fun{BonusPath BombInfo Bool}
       case BombInfo.bonus of pt(x:X1 y:Y1) then
 		            case BombInfo.pos of pt(x:X2 y:Y2) then
+                     case BombInfo.bonusPath of pt(x:X3 y:Y3) then
 		               if X1 == X2 andthen Y1 == Y2 then
                         Bool = true
                         {Random BombInfo true}
@@ -187,14 +188,14 @@ in
 		               elseif Y2 - Y1 > 0 then
                         Bool = false
                         if X2 - X1 > 0 then 
-                           if {IsBox BombInfo.map pt(x:X2-1 y:Y2)} then move(pt(x:X2-1 y:Y2))
-                           elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} then move(pt(x:X2 y:Y2-1))
+                           if {IsBox BombInfo.map pt(x:X2-1 y:Y2)} andthen X2 - 1 \= X3 andthen Y2 \= Y3 then move(pt(x:X2-1 y:Y2))
+                           elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} andthen X2 \= X3 andthen Y2 \= Y3 - 1 then move(pt(x:X2 y:Y2-1))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2+1)} then move(pt(x:X2 y:Y2+1))
                            elseif {IsBox BombInfo.map pt(x:X2+1 y:Y2)} then move(pt(x:X2+1 y:Y2))
                            end
                         else
-                           if {IsBox BombInfo.map pt(x:X2+1 y:Y2)} then move(pt(x:X2+1 y:Y2))
-                           elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} then move(pt(x:X2 y:Y2-1))
+                           if {IsBox BombInfo.map pt(x:X2+1 y:Y2)} andthen X2 + 1 \= X3 andthen Y2 \= Y3 then move(pt(x:X2+1 y:Y2))
+                           elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} andthen X2 \= X3 andthen Y2-1 \= Y3 then move(pt(x:X2 y:Y2-1))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2+1)} then move(pt(x:X2 y:Y2+1))
                            elseif {IsBox BombInfo.map pt(x:X2-1 y:Y2)} then move(pt(x:X2-1 y:Y2))
                            end
@@ -202,19 +203,20 @@ in
 		               elseif Y2 - Y1 < 0 then
                         Bool = false
                         if X2 - X1 > 0 then 
-                           if {IsBox BombInfo.map pt(x:X2-1 y:Y2)} then move(pt(x:X2-1 y:Y2))
-                           elseif {IsBox BombInfo.map pt(x:X2 y:Y2+1)} then move(pt(x:X2 y:Y2+1))
+                           if {IsBox BombInfo.map pt(x:X2-1 y:Y2)} andthen X2 - 1 \= X3 andthen Y2 \= Y3 then move(pt(x:X2-1 y:Y2))
+                           elseif {IsBox BombInfo.map pt(x:X2 y:Y2+1)} andthen X2 \= X3 andthen Y2 + 1 \= Y3 then  move(pt(x:X2 y:Y2+1))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} then move(pt(x:X2 y:Y2-1))
                            elseif {IsBox BombInfo.map pt(x:X2+1 y:Y2)} then move(pt(x:X2+1 y:Y2))
                            end
                         else
-                           if {IsBox BombInfo.map pt(x:X2+1 y:Y2)} then move(pt(x:X2+1 y:Y2))
-                           elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} then move(pt(x:X2 y:Y2-1))
+                           if {IsBox BombInfo.map pt(x:X2+1 y:Y2)} andthen X2 + 1 \= X3 andthen Y2 \= Y3 then move(pt(x:X2+1 y:Y2))
+                           elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)}  andthen X2 \= X3 andthen Y2 - 1 \= Y3 then move(pt(x:X2 y:Y2-1))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2+1)} then move(pt(x:X2 y:Y2+1))
                            elseif {IsBox BombInfo.map pt(x:X2-1 y:Y2)} then move(pt(x:X2-1 y:Y2))
                            end
                         end
                      end
+                  end
 		        end
          end
    end
@@ -424,18 +426,18 @@ in
             end
             case Action of move(Pos) then
                   if {IsFree Bl} then 
-                     {AdjoinAt BombInfo pos Pos}
-                  elseif Bl == true then {AdjoinAt {AdjoinAt BombInfo bonus nil} pos Pos}
+                     {AdjoinAt {AdjoinAt BombInfo bonusPath BombInfo.pos} pos Pos}
+                  elseif Bl == true then {AdjoinAt {AdjoinAt {AdjoinAt BombInfo bonusPath BombInfo.pos} bonus nil} pos Pos}
                   else {AdjoinAt BombInfo pos Pos}
                   end
             [] bomb(Pos) then 
-                  {AdjoinAt {AdjoinAt BombInfo bomb Pos} nBomb BombInfo.nBomb-1}
+                  {AdjoinAt {AdjoinAt {AdjoinAt BombInfo bonusPath BombInfo.pos} bomb Pos} nBomb BombInfo.nBomb-1}
 	         end
         end
       end
     end
    
-   %% bombInfo(id:ID state:State pos:Pos live:Live spawn:Spawn nBomb:NBomb point:Point listPlayer:ListPlayer map:Map bomb:Bomb bonus:Bonus) 
+   %% bombInfo(id:ID state:State pos:Pos live:Live spawn:Spawn nBomb:NBomb point:Point listPlayer:ListPlayer map:Map bomb:Bomb bonus:Bonus bonusPath:bonusPath) 
    proc{TreatStream Stream BombInfo}
       case Stream of nil then skip
       [] getId(ID)|T then 
