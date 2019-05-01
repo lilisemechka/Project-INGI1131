@@ -17,6 +17,14 @@ define
 
    BuildWindow
    
+   Wall
+   Dirt
+   Grass
+   BoxP
+   BoxB
+   Bomb
+   Fire
+
    Squares
    Items
    DrawMap
@@ -73,20 +81,26 @@ in
       handle(grid:Grid items:GridItems life:GridLife score:GridScore)
    end
 
-   
+   Wall = {QTk.newImage photo(file:'Wall.gif' height:50 width:50)}
+   Dirt = {QTk.newImage photo(file:'Dirt.gif' height:50 width:50)}
+   Grass = {QTk.newImage photo(file:'Grass.gif' height:50 width:50)}
+   BoxP = {QTk.newImage photo(file:'BoxP.gif' height:30 width:30)}
+   BoxB = {QTk.newImage photo(file:'BoxB.gif' height:30 width:30)}
+   Bomb = {QTk.newImage photo(file:'Bomb.gif' height:30 width:30)}
+   Fire = {QTk.newImage photo(file:'Fire.gif' height:40 width:40)}
 %%%%% Squares of path and wall
-   Squares = square(0:label(text:"" width:1 height:1 bg:c(0 0 204))
-		    1:label(text:"" borderwidth:5 relief:raised width:1 height:1 bg:c(0 0 0))
-		    2:label(text:"" width:1 height:1 bg:c(0 0 204))
-		    3:label(text:"" width:1 height:1 bg:c(0 0 204))
-		    4:label(text:"" width:1 height:1 bg:c(0 150 150))
+   Squares = square(0:label(image:Grass width:1 height:1 bg:c(0 0 204))
+		    1:label(image:Wall borderwidth:5 relief:raised width:1 height:1 bg:c(0 0 0))
+		    2:label(image:Grass width:1 height:1 bg:c(0 0 204))
+		    3:label(image:Grass width:1 height:1 bg:c(0 0 204))
+		    4:label(image:Dirt width:1 height:1 bg:c(0 150 150))
 		   )
-   Items = items(boxpoint:fun{$ Handle} label(text:"" borderwidth:2 relief:raised width:3 height:2 bg:c(139 69 19) handle:Handle) end 
-		 boxbonus:fun{$ Handle} label(text:"" borderwidth:2 relief:raised width:3 height:2 bg:c(210 105 30) handle:Handle) end 
+   Items = items(boxpoint:fun{$ Handle} label(image:BoxP borderwidth:2 relief:raised width:30 height:30 bg:c(139 69 19) handle:Handle) end 
+		 boxbonus:fun{$ Handle} label(image:BoxB borderwidth:2 relief:raised width:30 height:30 bg:c(210 105 30) handle:Handle) end 
 		 point:fun{$ Handle} label(text:"" height:1 width:1 handle:Handle bg:white) end 
 		 bonus:fun{$ Handle} label(text:"" height:1 width:1 handle:Handle bg:green) end 
-		 bomb:fun{$ Handle} label(text:"" height:1 width:1 handle:Handle bg:black) end 
-		 fire:fun{$ Handle} label(text:"" height:1 width:2 handle:Handle bg:red) end 
+		 bomb:fun{$ Handle} label(image:Bomb height:30 width:30 handle:Handle bg:black) end 
+		 fire:fun{$ Handle} label(image:Fire height:40 width:40 handle:Handle bg:red) end 
 		)
    
 %%%%% Function to draw the map

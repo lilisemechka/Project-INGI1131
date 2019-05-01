@@ -2,6 +2,7 @@ functor
 import 
 	Input
 	PlayerManager
+   OS
 export
 	getPlayers:GetPlayers
 
@@ -10,6 +11,7 @@ define
    FindSpawns
    AssignSpawns %Proc   
    SpawnPlayers %Proc
+   RandomPlayers
    GetPlayers
 in
 	%% Initializing all players and creating one port / player
@@ -78,13 +80,41 @@ in
       	end
    	end
 
+      fun{RandomPlayers Players NbPlayers}
+         local
+            fun{GetN PList N Nth}
+               case PList of nil then nil
+               [] H|T then
+                  if N==0 then
+                     Nth = H
+                     T
+                  else
+                     H|{GetN T N-1 Nth}
+                  end
+               end
+            end
+         in
+            case Players of nil then nil
+            [] H|T then
+               local
+                  Nth
+                  L1 = {GetN Players ({OS.rand} mod NbPlayers) Nth}
+               in
+                  Nth|{RandomPlayers L1 NbPlayers-1}
+               end
+            end
+         end
+      end
+
+
+
    	fun{GetPlayers P_GUI}
    		local
    			R
    			Spawns
    			PortPlayers
    		in
-   			PortPlayers = {Initialize Input.nbBombers Input.bombers Input.colorsBombers 1 P_GUI}
+   			PortPlayers = {Initialize Input.nbBombers {RandomPlayers Input.bombers Input.nbBombers} {RandomPlayers Input.colorsBombers Input.nbBombers} 1 P_GUI}
    			Spawns = {FindSpawns Input.map 1 1}
    		 	R = {AssignSpawns PortPlayers Spawns Spawns}
    		 	{SpawnPlayers PortPlayers P_GUI R}

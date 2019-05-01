@@ -10,7 +10,6 @@ import
 export
 	doActionTBT:DoActionTBT
 	handleBombs:HandleBombs
-   explode:Explode
 define
    	ExploLoc
    	Explode
@@ -68,7 +67,14 @@ in
                         skip
 		                else
                			local NewMap1 in
-               			   NewMap1 = {Utilitaries.changeMap Map Pos fire}
+                           if Type == 5 then
+                              NewMap1 = {Utilitaries.changeMap Map Pos pointAndFire}
+                           elseif Type == 6 then
+                              NewMap1 = {Utilitaries.changeMap Map Pos bonusAndFire}
+                           else
+                              NewMap1 = {Utilitaries.changeMap Map Pos fire}
+                           end
+               			   
                			   case Direction
                			   of north then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action north Acc+1 NewMap1 NewMap Players P_GUI}
                			   [] south then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action south Acc+1 NewMap1 NewMap Players P_GUI}
