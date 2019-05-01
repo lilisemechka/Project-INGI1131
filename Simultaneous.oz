@@ -122,24 +122,26 @@ in
 		                       	skip
 	                     	end
                   		[] hideFire then
-            			   	if Type == 12 then 
-            			   		{Send PBombs changeMap(type:deleteFireP pos:Pos)}
-                           		{Send P_GUI hideFire(Pos)}
-                           		End = 1
-            			   	elseif Type == 13 then 
-                           		{Send PBombs changeMap(pos:Pos type:deleteFireB)}
-                           		{Send P_GUI hideFire(Pos)}
-                           		End = 1
-            			   	else 
-            			   		{Send PBombs changeMap(pos:Pos type:deleteFire)}           			   
-               			   		{Send P_GUI hideFire(Pos)}
-               			   	end
-           			   		case Direction
-           			   		of north then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action north Acc+1 PBombs Players P_GUI End}
-           			   		[] south then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action south Acc+1 PBombs Players P_GUI End}
-           			   		[] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 PBombs Players P_GUI End}
-           			   		[] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 PBombs Players P_GUI End}
-           			   		end
+                  			if Type == 2 orelse Type ==3 then
+                  				End = 1
+                  			else
+	            			   	if Type == 12 then 
+	            			   		{Send PBombs changeMap(type:deleteFireP pos:Pos)}
+	                           		{Send P_GUI hideFire(Pos)}
+	            			   	elseif Type == 13 then 
+	                           		{Send PBombs changeMap(pos:Pos type:deleteFireB)}
+	                           		{Send P_GUI hideFire(Pos)}
+	            			   	else 
+	            			   		{Send PBombs changeMap(pos:Pos type:deleteFire)}           			   
+	               			   		{Send P_GUI hideFire(Pos)}
+	               			   	end
+	           			   		case Direction
+	           			   		of north then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action north Acc+1 PBombs Players P_GUI End}
+	           			   		[] south then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action south Acc+1 PBombs Players P_GUI End}
+	           			   		[] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 PBombs Players P_GUI End}
+	           			   		[] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 PBombs Players P_GUI End}
+	           			   		end
+	           			   	end
 		             	end
 		            else
 		            	End = 1
@@ -261,13 +263,16 @@ in
 	         		local
 	         			Pos = B.pos
 	         			RandTime = Input.timingBombMin + {OS.rand} mod (Input.timingBombMax - Input.timingBombMin)
+	         			PlayersList1
+	         			PlayersList2
 	         		in
 	         			thread 
 	         				{Delay RandTime}
 	         				{Send P_GUI hideBomb(Pos)}
 	         				{Send B.portbomb remove(B)}
 	                  		{Send P_GUI spawnFire(Pos)}
-		                  	for E in PlayersList do
+	                  		{Send PBombs readPlayers(PlayersList1)}
+		                  	for E in PlayersList1 do
 		                     	case E.pos of pt(x:X y:Y) then
 		                        	if X==Pos.x andthen Y==Pos.y then
 			                           	local 
@@ -286,7 +291,8 @@ in
 		                        end
 		                    end
 		                    {Send PBombs changeMap(type:fire pos:Pos)}
-		                    {Explode Pos spawnFire PBombs PlayersList P_GUI}
+		                    {Send PBombs readPlayers(PlayersList2)}
+		                    {Explode Pos spawnFire PBombs PlayersList2 P_GUI}
 		                    local 
 		                    	NbBombs 
 		                    in
@@ -294,7 +300,7 @@ in
                   			end
                   			{Send P_GUI hideFire(Pos)}
                   			{Send PBombs changeMap(type:deleteFire pos:Pos)}
-                  			{Explode Pos hideFire PBombs PlayersList P_GUI}
+                  			{Explode Pos hideFire PBombs PlayersList2 P_GUI}
 	                  	end	                  	   
 	         			{TreatBombs T PBombs Map PlayersList P_GUI AllPlayers}
 	         		end

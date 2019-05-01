@@ -49,7 +49,7 @@ in
 %%%% Players description %%%%
 
    NbBombers = 2
-   Bombers = [player001name player001name]
+   Bombers = [player001name player000bomber]
    ColorBombers = [yellow red]
 
 %%%% Parameters %%%%
@@ -58,7 +58,7 @@ in
    NbBombs = 1
  
    ThinkMin = 500  % in millisecond
-   ThinkMax = 2000 % in millisecond
+   ThinkMax = 1000 % in millisecond
    
    Fire = 3
    TimingBomb = 3 
