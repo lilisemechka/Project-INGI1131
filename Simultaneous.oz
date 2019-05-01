@@ -106,9 +106,9 @@ in
 	                        	end
 	                        	skip
 			                else
-			                	if Type == 5 then
+			                	if Type == 5 orelse Type == 12 then
 			                		{Send PBombs changeMap(type:pointAndFire pos:Pos)}
-			                	elseif Type == 6 then
+			                	elseif Type == 6 orelse Type == 13 then
 			                		{Send PBombs changeMap(type:bonusAndFire pos:Pos)}
 			                	else
 		               				{Send PBombs changeMap(type:fire pos:Pos)}
@@ -122,7 +122,7 @@ in
 		                       	skip
 	                     	end
                   		[] hideFire then
-                  			if Type == 2 orelse Type ==3 then
+                  			if Type == 0 orelse Type == 2 orelse Type ==3 orelse Type == 4 orelse Type == 5 orelse Type == 6 then
                   				End = 1
                   			else
 	            			   	if Type == 12 then 

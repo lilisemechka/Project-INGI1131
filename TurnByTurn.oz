@@ -67,9 +67,9 @@ in
                         skip
 		                else
                			local NewMap1 in
-                           if Type == 5 then
+                           if Type == 5 orelse Type == 12 then
                               NewMap1 = {Utilitaries.changeMap Map Pos pointAndFire}
-                           elseif Type == 6 then
+                           elseif Type == 6 orelse Type == 13 then
                               NewMap1 = {Utilitaries.changeMap Map Pos bonusAndFire}
                            else
                               NewMap1 = {Utilitaries.changeMap Map Pos fire}
@@ -87,7 +87,7 @@ in
                   [] hideFire then
             			local NewMap1
             			in
-                        if Type == 2 orelse Type == 3 then
+                        if Type == 0 orelse Type == 2 orelse Type ==3 orelse Type == 4 orelse Type == 5 orelse Type == 6 then
                            NewMap = Map
                         else
                			   if Type == 12 then 
