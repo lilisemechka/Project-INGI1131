@@ -371,14 +371,16 @@ in
                            elseif {IsBox BombInfo.map pt(x:X2-1 y:Y2)} andthen (X2 - 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2-1 y:Y2))
                            elseif {IsBox BombInfo.map pt(x:X2+1 y:Y2)} andthen (X2 + 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2+1 y:Y2))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2+1)} andthen (X2 \= X3 orelse Y2 + 1 \= Y3) then move(pt(x:X2 y:Y2+1))
-                           else bomb(pt(x:X2 y:Y2))
+                           elseif BombInfo.nBomb > 0 then bomb(pt(x:X2 y:Y2))
+                           else {Random BombInfo Bool}
                            end
                         else
                            if {IsBox BombInfo.map pt(x:X2 y:Y2+1)} andthen (X2 \= X3 orelse Y2 + 1 \= Y3) then move(pt(x:X2 y:Y2+1))
                            elseif {IsBox BombInfo.map pt(x:X2-1 y:Y2)} andthen (X2 - 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2-1 y:Y2))
                            elseif {IsBox BombInfo.map pt(x:X2+1 y:Y2)} andthen (X2 + 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2+1 y:Y2))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} andthen (X2 \= X3 orelse Y2 - 1 \= Y3) then move(pt(x:X2 y:Y2-1))
-                           else bomb(pt(x:X2 y:Y2))
+                           elseif BombInfo.nBomb > 0 then bomb(pt(x:X2 y:Y2))
+                           else {Random BombInfo Bool}
                            end
                         end
 		               elseif Y1 == Y2 then
@@ -388,14 +390,16 @@ in
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} andthen (X2 \= X3 orelse Y2 - 1 \= Y3) then move(pt(x:X2 y:Y2-1))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2+1)} andthen (X2 \= X3 orelse Y2 + 1 \= Y3) then move(pt(x:X2 y:Y2+1))
                            elseif {IsBox BombInfo.map pt(x:X2+1 y:Y2)} andthen (X2 + 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2+1 y:Y2))
-                           else bomb(pt(x:X2 y:Y2))
+                           elseif BombInfo.nBomb > 0 then bomb(pt(x:X2 y:Y2))
+                           else {Random BombInfo Bool}
                            end
                         else
                            if {IsBox BombInfo.map pt(x:X2+1 y:Y2)} andthen (X2 + 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2+1 y:Y2))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} andthen (X2 \= X3 orelse Y2 - 1 \= Y3) then move(pt(x:X2 y:Y2-1))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2+1)} andthen (X2 \= X3 orelse Y2 + 1 \= Y3) then move(pt(x:X2 y:Y2+1))
                            elseif {IsBox BombInfo.map pt(x:X2-1 y:Y2)} andthen (X2 - 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2-1 y:Y2))
-                           else bomb(pt(x:X2 y:Y2))
+                           elseif BombInfo.nBomb > 0 then bomb(pt(x:X2 y:Y2))
+                           else {Random BombInfo Bool}
                            end
                         end
 		               elseif Y2 - Y1 > 0 then
@@ -405,14 +409,16 @@ in
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} andthen (X2 \= X3 orelse Y2 - 1 \= Y3) then move(pt(x:X2 y:Y2-1))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2+1)} andthen (X2 \= X3 orelse Y2 + 1 \= Y3) then move(pt(x:X2 y:Y2+1))
                            elseif {IsBox BombInfo.map pt(x:X2+1 y:Y2)} andthen (X2 + 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2+1 y:Y2))
-                           else bomb(pt(x:X2 y:Y2))
+                           elseif BombInfo.nBomb > 0 then bomb(pt(x:X2 y:Y2))
+                           else {Random BombInfo Bool}
                            end
                         else
                            if {IsBox BombInfo.map pt(x:X2+1 y:Y2)} andthen (X2 + 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2+1 y:Y2))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} andthen (X2 \= X3 orelse Y2 - 1 \= Y3) then move(pt(x:X2 y:Y2-1))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2+1)} andthen (X2 \= X3 orelse Y2 + 1 \= Y3) then move(pt(x:X2 y:Y2+1))
                            elseif {IsBox BombInfo.map pt(x:X2-1 y:Y2)} andthen (X2 - 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2-1 y:Y2))
-                           else bomb(pt(x:X2 y:Y2))
+                           elseif BombInfo.nBomb > 0 then bomb(pt(x:X2 y:Y2))
+                           else {Random BombInfo Bool}
                            end
                         end
 		               elseif Y2 - Y1 < 0 then
@@ -422,14 +428,16 @@ in
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2+1)} andthen (X2 \= X3 orelse Y2 + 1 \= Y3) then  move(pt(x:X2 y:Y2+1))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} andthen (X2 \= X3 orelse Y2 - 1 \= Y3) then move(pt(x:X2 y:Y2-1))
                            elseif {IsBox BombInfo.map pt(x:X2+1 y:Y2)} andthen (X2 + 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2+1 y:Y2))
-                           else bomb(pt(x:X2 y:Y2))
+                           elseif BombInfo.nBomb > 0 then bomb(pt(x:X2 y:Y2))
+                           else {Random BombInfo Bool}
                            end
                         else
                            if {IsBox BombInfo.map pt(x:X2+1 y:Y2)} andthen (X2 + 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2+1 y:Y2))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2-1)} andthen (X2 \= X3 orelse Y2 - 1 \= Y3) then move(pt(x:X2 y:Y2-1))
                            elseif {IsBox BombInfo.map pt(x:X2 y:Y2+1)} andthen (X2 \= X3 orelse Y2 + 1\= Y3) then move(pt(x:X2 y:Y2+1))
                            elseif {IsBox BombInfo.map pt(x:X2-1 y:Y2)} andthen (X2 - 1 \= X3 orelse Y2 \= Y3) then move(pt(x:X2-1 y:Y2))
-                           else bomb(pt(x:X2 y:Y2))
+                           elseif BombInfo.nBomb > 0 then bomb(pt(x:X2 y:Y2))
+                           else {Random BombInfo Bool}
                            end
                         end
                      end
