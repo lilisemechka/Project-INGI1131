@@ -96,13 +96,13 @@ in
             			   else 
                            NewMap1 = {Utilitaries.changeMap Map Pos deleteFire}            			   
                			   {Send P_GUI hideFire(Pos)}
-               			   case Direction
-               			   of north then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action north Acc+1 NewMap1 NewMap Players P_GUI}
-               			   [] south then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action south Acc+1 NewMap1 NewMap Players P_GUI}
-               			   [] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 NewMap1 NewMap Players P_GUI}
-               			   [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 NewMap1 NewMap Players P_GUI}
-               			   end
                         end
+            			   case Direction
+            			   of north then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action north Acc+1 NewMap1 NewMap Players P_GUI}
+            			   [] south then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action south Acc+1 NewMap1 NewMap Players P_GUI}
+            			   [] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 NewMap1 NewMap Players P_GUI}
+            			   [] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 NewMap1 NewMap Players P_GUI}
+            			   end
             			end
 		             end
 	           else

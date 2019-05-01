@@ -16,6 +16,8 @@ define
 	RemovePlayer
 	ExploLoc
 	Explode
+	BombPort
+	TreatPlantedBombs
 in
 	fun{ChangePlayer Players PlayerID NewPos}
 
@@ -131,13 +133,13 @@ in
             			   	else 
             			   		{Send PBombs changeMap(pos:Pos type:deleteFire)}           			   
                			   		{Send P_GUI hideFire(Pos)}
-               			   		case Direction
-               			   		of north then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action north Acc+1 PBombs Players P_GUI End}
-               			   		[] south then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action south Acc+1 PBombs Players P_GUI End}
-               			   		[] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 PBombs Players P_GUI End}
-               			   		[] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 PBombs Players P_GUI End}
-               			   		end
-            				end
+               			   	end
+           			   		case Direction
+           			   		of north then {ExploLoc pt(x:Pos.x y:Pos.y-1) Action north Acc+1 PBombs Players P_GUI End}
+           			   		[] south then {ExploLoc pt(x:Pos.x y:Pos.y+1) Action south Acc+1 PBombs Players P_GUI End}
+           			   		[] west then {ExploLoc pt(x:Pos.x-1 y:Pos.y) Action west Acc+1 PBombs Players P_GUI End}
+           			   		[] east then {ExploLoc pt(x:Pos.x+1 y:Pos.y) Action east Acc+1 PBombs Players P_GUI End}
+           			   		end
 		             	end
 		            else
 		            	End = 1
@@ -175,6 +177,68 @@ in
 	      	{Wait End4}
 	    end
    	end
+
+   	fun{BombPort}
+   		local
+   			S 
+   			R = {NewPort S}
+   		in
+   			thread {TreatPlantedBombs S nil} end
+   			R 
+   		end
+   	end
+
+   	proc{TreatPlantedBombs Stream BombsPlanted}
+   		local 
+   			fun{Remove B BombsPlanted IsIn}
+   				local
+   					ID
+   					{Send B.port getId(ID)}
+   					Pos = B.pos
+   				in	   				
+	   				case BombsPlanted of nil then 
+	   					IsIn = false
+	   					nil
+	   				[] H|T then
+	   					local
+	   						IDLoc
+	   						{Send H.port getId(IDLoc)}
+	   					in
+	   						if IDLoc == ID andthen Pos == H.pos then
+	   							IsIn = true
+	   							T 
+	   						else
+	   							H|{Remove B T IsIn}
+	   						end
+	   					end
+	   				end
+	   			end
+	   		end
+	   	in	   	
+	   		case Stream of nil then skip
+	   		[] H|T then
+	   			case H of addBomb(B) then 
+	   				local
+	   					IsIn
+	   					Thrash = {Remove B BombsPlanted IsIn}
+	   				in
+	   					if IsIn then
+	   						{TreatPlantedBombs T BombsPlanted}
+	   					else
+	   						{TreatPlantedBombs T B|BombsPlanted}
+	   					end
+	   				end
+	   			[] remove(B) then
+	   				local
+	   					Thrash
+	   				in
+	   			   		{TreatPlantedBombs T {Remove B BombsPlanted Thrash}}
+	   			   	end
+	   			end
+	   		end
+	   	end
+	end 
+
 				
    	fun{HandlePort Map PlayersList P_GUI}
       	local
@@ -201,6 +265,7 @@ in
 	         			thread 
 	         				{Delay RandTime}
 	         				{Send P_GUI hideBomb(Pos)}
+	         				{Send B.portbomb remove(B)}
 	                  		{Send P_GUI spawnFire(Pos)}
 		                  	for E in PlayersList do
 		                     	case E.pos of pt(x:X y:Y) then
@@ -269,7 +334,7 @@ in
 
 
 
-   	proc{DoAction H PBombs AllPlayers P_GUI}   		
+   	proc{DoAction H PBombs PortBomb AllPlayers P_GUI}   		
 	    local 
 	        ID
 	        Action
@@ -304,7 +369,7 @@ in
 	                  	case PosSpawn of pt(x:X y:Y) then
 	                     	{Send P_GUI spawnPlayer(IDSpawn PosSpawn)}
 	                     	{Send PBombs changePlayer(player(port:H.port pos:PosSpawn))}
-	                     	{DoAction H PBombs AllPlayers P_GUI}
+	                     	{DoAction H PBombs PortBomb AllPlayers P_GUI}
 	                  	else
 	                  		{Send PBombs removePlayer(H)}
 	                  		local
@@ -358,17 +423,19 @@ in
 			               	end  
 			               	{Send PBombs changeMap(type:deleteBonus pos:Pos)}     		            	
 			            end
-			        [] bomb(Pos) then                
-			            {Send P_GUI spawnBomb(Pos)}
-			            local 
-			            	PlayersList
-			            in
+			        [] bomb(Pos) then
+			        	local
+			        		B = bomb(pos:Pos port:H.port portbomb:PortBomb)
+			        		PlayersList
+			        	in                
+				            {Send P_GUI spawnBomb(Pos)}
+				            {Send PortBomb addBomb(B)}
 			            	{Send PBombs readPlayers(PlayersList)}
 				            for E in PlayersList do
 				               	{Send E.port info(bombPlanted(Pos))}
 				            end
+				            {Send PBombs addBomb(B)}
 				        end
-			            {Send PBombs addBomb(bomb(pos:Pos port:H.port))}
 			        else
 			            {Browser.browse Action} 
 			        end
@@ -376,7 +443,7 @@ in
 			        	RandTime = Input.thinkMin + {OS.rand} mod (Input.thinkMax - Input.thinkMin)
 			        in
 			        	{Delay RandTime}
-			        	{DoAction H PBombs AllPlayers P_GUI}
+			        	{DoAction H PBombs PortBomb AllPlayers P_GUI}
 			        end
 			    end
 			end                 
@@ -386,11 +453,12 @@ in
 
    	proc{LaunchSimul PlayersList P_GUI}			 				   		
       	local  
-      		PBombs = {HandlePort Input.map PlayersList P_GUI}           	
+      		PBombs = {HandlePort Input.map PlayersList P_GUI}
+      		PortBomb = {BombPort}           	
       	in
 	        for P in PlayersList do
 	            thread 
-	               	{DoAction P PBombs PlayersList P_GUI}
+	               	{DoAction P PBombs PortBomb PlayersList P_GUI}
 	            end
 	        end
       	end			   	
