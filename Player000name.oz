@@ -11,11 +11,6 @@ define
    TreatStream
    Name = 'namefordebug'
 
-   %Attributes
-   PlayerID
-   SpawnPos
-   PlayerState
-
    %functions
    GetState
    Spawn
@@ -34,10 +29,9 @@ in
       thread %% filter to test validity of message sent to the player
          OutputStream = {Projet2019util.portPlayerChecker Name ID Stream}
       end
-      PlayerID = ID
       {NewPort Stream Port}
       thread
-	     {TreatStream OutputStream bombInfo(id:PlayerID state:off pos:nil live:Input.nbLives spawn:nil nBomb:Input.nbBombs point:0 listPlayer:nil map:Input.map) }
+	     {TreatStream OutputStream bombInfo(id:ID state:off pos:nil live:Input.nbLives spawn:nil nBomb:Input.nbBombs point:0 listPlayer:nil map:Input.map) }
       end
       Port
    end
@@ -45,7 +39,7 @@ in
    fun{Spawn BombInfo ID Pos}
       if (BombInfo.state == off) andthen (BombInfo.live > 0) then
          Pos = BombInfo.spawn
-         ID = PlayerID
+         ID = BombInfo.id
          {AdjoinAt {AdjoinAt BombInfo state on} pos Pos}
       else
          Pos = null
@@ -76,7 +70,7 @@ in
          BombInfo
       else
          local NewLife in
-            ID = PlayerID
+            ID = BombInfo.id
             NewLife = BombInfo.live-1
             Result = death(NewLife)
             {AdjoinAt {AdjoinAt BombInfo state off} live NewLife}
@@ -128,7 +122,7 @@ in
    fun{Info BombInfo Message}
       case Message of
          spawnPlayer(ID Pos) then
-            if(ID == PlayerID) then BombInfo
+            if(ID == BombInfo.id) then BombInfo
             else 
                local NewList in
                   NewList = {ChangePos ID Pos BombInfo.listPlayer}
@@ -136,7 +130,7 @@ in
                end
             end
          [] movePlayer(ID Pos) then
-            if(ID == PlayerID) then BombInfo
+            if(ID == BombInfo.id) then BombInfo
             else 
                local NewList in
                   NewList = {ChangePos ID Pos BombInfo.listPlayer}
@@ -144,7 +138,7 @@ in
                end
             end
          [] deadPlayer(ID) then
-            if(ID == PlayerID) then BombInfo
+            if(ID == BombInfo.id) then BombInfo
             else 
                local NewList in
                   NewList = {DeletePlayer ID BombInfo.listPlayer}
@@ -187,7 +181,7 @@ in
          Action = null
          BombInfo
       else
-         ID = PlayerID
+         ID = BombInfo.id
          local Random in
             Random = {OS.rand} mod 5
             if Random == 0 then 
@@ -236,10 +230,10 @@ in
 
       case Stream of nil then skip
       [] getId(ID)|T then 
-         ID = PlayerID
+         ID = BombInfo.id
          {TreatStream T BombInfo}
       [] getState(ID State)|T then 
-         ID = PlayerID
+         ID = BombInfo.id
          State = BombInfo.state
          {TreatStream T BombInfo}
       [] assignSpawn(Pos)|T then 
