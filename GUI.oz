@@ -101,7 +101,7 @@ in
 		   )
    Items = items(boxpoint:fun{$ Handle} label(image:BoxP borderwidth:2 relief:raised width:30 height:30 bg:c(139 69 19) handle:Handle) end 
 		 boxbonus:fun{$ Handle} label(image:BoxB borderwidth:2 relief:raised width:30 height:30 bg:c(210 105 30) handle:Handle) end 
-		 point:fun{$ Handle} label(image:Point height:30 width:30 handle:Handle bg:white) end 
+		 point:fun{$ Handle} label(image:Point height:30 width:30 handle:Handle bg:green) end 
 		 bonus:fun{$ Handle} label(image:Bonus height:30 width:30 handle:Handle bg:green) end 
 		 bomb:fun{$ Handle} label(image:Bomb height:30 width:30 handle:Handle bg:black) end 
 		 fire:fun{$ Handle} label(image:Fire height:40 width:40 handle:Handle bg:red) end 

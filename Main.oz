@@ -22,7 +22,7 @@ in
 
    {Delay 5000}
    if Input.isTurnByTurn then
-      {TurnByTurn.doActionTBT Players nil Input.map P_GUI}
+      {TurnByTurn.doActionTBT Players nil Input.map Players P_GUI}
    else
       {Simultaneous.launchSimul Players P_GUI}
    end
