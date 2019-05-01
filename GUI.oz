@@ -26,6 +26,12 @@ define
    Fire
    Bonus
    Point
+   Black
+   White
+   Yellow
+   Green
+   Red
+   Blue
 
    Squares
    Items
@@ -92,6 +98,12 @@ in
    Fire = {QTk.newImage photo(file:'Fire.gif' height:40 width:40)}
    Bonus = {QTk.newImage photo(file:'Bonus.gif' height:30 width:30)}
    Point = {QTk.newImage photo(file:'Point.gif' height:30 width:30)}
+   Black ={QTk.newImage photo(file:'DarkVadorBlack.gif' height:30 width:30)}
+   White = {QTk.newImage photo(file:'GandalfTheWhite.gif' height:30 width:30)}
+   Yellow = {QTk.newImage photo(file:'PacManYellow.gif' height:30 width:30)}
+   Green = {QTk.newImage photo(file:'ZeldaGreen.gif' height:30 width:30)}
+   Blue = {QTk.newImage photo(file:'SonicBlue.gif' height:30 width:30)}
+   Red = {QTk.newImage photo(file:'MarioRed.gif' height:30 width:30)}
 %%%%% Squares of path and wall
    Squares = square(0:label(image:Grass width:1 height:1 bg:c(0 0 204))
 		    1:label(image:Wall borderwidth:5 relief:raised width:1 height:1 bg:c(0 0 0))
@@ -190,7 +202,21 @@ in
       Handle HandleLife HandleScore Id Color LabelPlayer LabelLife LabelScore
    in
       bomber(id:Id color:Color name:_) = ID
-      LabelPlayer = label(text:"P" handle:Handle borderwidth:5 relief:raised bg:Color ipadx:5 ipady:5)
+      case Color of white then
+         LabelPlayer = label(image:White handle:Handle borderwidth:5 relief:raised bg:Color ipadx:5 ipady:5)
+      [] black then 
+         LabelPlayer = label(image:Black handle:Handle borderwidth:5 relief:raised bg:Color ipadx:5 ipady:5)
+      [] yellow then
+         LabelPlayer = label(image:Yellow handle:Handle borderwidth:5 relief:raised bg:Color ipadx:5 ipady:5)
+      [] green then
+         LabelPlayer = label(image:Green handle:Handle borderwidth:5 relief:raised bg:Color ipadx:5 ipady:5)
+      [] blue then
+         LabelPlayer = label(image:Blue handle:Handle borderwidth:5 relief:raised bg:Color ipadx:5 ipady:5)
+      [] red then
+         LabelPlayer = label(image:Red handle:Handle borderwidth:5 relief:raised bg:Color ipadx:5 ipady:5)
+      else
+         LabelPlayer = label(text:"P" handle:Handle borderwidth:5 relief:raised bg:Color ipadx:5 ipady:5)
+      end
       LabelLife = label(text:Input.nbLives borderwidth:5 handle:HandleLife relief:solid bg:Color ipadx:5 ipady:5)
       LabelScore = label(text:0 borderwidth:5 handle:HandleScore relief:solid bg:Color ipadx:5 ipady:5)
       {Grid.grid configure(LabelPlayer row:0 column:0 sticky:wesn)}
