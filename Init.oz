@@ -115,7 +115,11 @@ in
    			PortPlayers
    		in
    			PortPlayers = {Initialize Input.nbBombers {RandomPlayers Input.bombers Input.nbBombers} {RandomPlayers Input.colorsBombers Input.nbBombers} 1 P_GUI}
-   			Spawns = {FindSpawns Input.map 1 1}
+            if Input.useExtention then
+   			   Spawns = {FindSpawns Input.map1 1 1}
+            else
+               Spawns = {FindSpawns Input.map 1 1}
+            end
    		 	R = {AssignSpawns PortPlayers Spawns Spawns}
    		 	{SpawnPlayers PortPlayers P_GUI R}
    		 	R

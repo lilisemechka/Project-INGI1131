@@ -165,13 +165,13 @@ in
         	End4
         in
 	        case Pos of pt(x:X y:Y) then
-	        	{ExploLoc pt(x:X-1 y:Y) Action west 0 PBombs Players P_GUI End1}
+	        	{ExploLoc pt(x:X-1 y:Y) Action west 1 PBombs Players P_GUI End1}
 
-	        	{ExploLoc pt(x:X+1 y:Y) Action east 0 PBombs Players P_GUI End2}
+	        	{ExploLoc pt(x:X+1 y:Y) Action east 1 PBombs Players P_GUI End2}
 
-	        	{ExploLoc pt(x:X y:Y+1) Action south 0 PBombs Players P_GUI End3}
+	        	{ExploLoc pt(x:X y:Y+1) Action south 1 PBombs Players P_GUI End3}
 
-	        	{ExploLoc pt(x:X y:Y-1) Action north 0 PBombs Players P_GUI End4}
+	        	{ExploLoc pt(x:X y:Y-1) Action north 1 PBombs Players P_GUI End4}
 	      	end
 	      	{Wait End1}
 	      	{Wait End2}

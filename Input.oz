@@ -6,6 +6,7 @@ export
    nbRow:NbRow
    nbColumn:NbColumn
    map:Map
+   map1:Map1
    nbBombers:NbBombers
    bombers:Bombers
    colorsBombers:ColorBombers
@@ -24,12 +25,13 @@ define
    NbLives NbBombs
    ThinkMin ThinkMax
    TimingBomb TimingBombMin TimingBombMax Fire
+   Map1
 in 
 
 
 %%%% Style of game %%%%
    
-   IsTurnByTurn = true
+   IsTurnByTurn = false
    UseExtention = false
    PrintOK = true
 
@@ -46,11 +48,19 @@ in
 	  [1 4 0 2 2 2 2 2 2 2 0 4 1]
 	  [1 1 1 1 1 1 1 1 1 1 1 1 1]]
 
+   Map1 = [[1 1 1 1 1 1 1 1 1 1 1 1 1]
+     [1 4 0 2 2 2 2 2 2 2 0 4 1]
+     [1 0 1 3 1 3 3 3 1 3 1 0 1]
+     [1 2 2 2 2 3 8 3 2 2 2 2 1]
+     [1 0 1 3 1 3 3 3 1 3 1 0 1]
+     [1 4 0 2 2 2 2 2 2 2 0 4 1]
+     [1 1 1 1 1 1 1 1 1 1 1 1 1]]
+
 %%%% Players description %%%%
 
-   NbBombers = 3
-   Bombers = [player001name player001name player001name]
-   ColorBombers = [yellow red blue]
+   NbBombers = 4
+   Bombers = [player105cerbere player105cerbere player105cerbere player105cerbere]
+   ColorBombers = [yellow red blue white]
 
 %%%% Parameters %%%%
 

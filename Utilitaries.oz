@@ -27,6 +27,8 @@ in
 	      	       elseif Type == deleteFire then 0|T
 	      	       elseif Type == deleteFireP then 5|T
 	      	       elseif Type == deleteFireB then 6|T
+	      	       elseif Type == deleteFireBB then 8|T
+	      	       elseif Type == bbAndFire then 9|T
 	      	       end
 	      	    end
 	      	 end

@@ -38,7 +38,12 @@ in
       end
       {NewPort Stream Port}
       thread
-	     {TreatStream OutputStream bombInfo(id:ID state:off pos:nil live:Input.nbLives spawn:nil nBomb:Input.nbBombs point:0 listPlayer:nil map:Input.map bomb:nil bonus:nil bonusPath:pt(x:0 y:0))}
+         Map
+         in
+         if Input.useExtention then Map = Input.map1
+         else Map = Input.map
+         end
+	     {TreatStream OutputStream bombInfo(id:ID state:off pos:nil live:Input.nbLives spawn:nil nBomb:Input.nbBombs point:0 listPlayer:nil map:Map bomb:nil bonus:nil bonusPath:pt(x:0 y:0))}
       end
       Port
    end

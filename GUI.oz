@@ -32,6 +32,7 @@ define
    Green
    Red
    Blue
+   Voodoo
 
    Squares
    Items
@@ -104,12 +105,14 @@ in
    Green = {QTk.newImage photo(file:'./Images/ZeldaGreen.gif' height:30 width:30)}
    Blue = {QTk.newImage photo(file:'./Images/SonicBlue.gif' height:30 width:30)}
    Red = {QTk.newImage photo(file:'./Images/MarioRed.gif' height:30 width:30)}
+   Voodoo = {QTk.newImage photo(file:'./Images/Voodoo.gif' height:40 width:40)}
 %%%%% Squares of path and wall
    Squares = square(0:label(image:Grass width:1 height:1 bg:c(0 0 204))
 		    1:label(image:Wall borderwidth:5 relief:raised width:1 height:1 bg:c(0 0 0))
 		    2:label(image:Grass width:1 height:1 bg:c(0 0 204))
 		    3:label(image:Grass width:1 height:1 bg:c(0 0 204))
 		    4:label(image:Dirt width:1 height:1 bg:c(0 150 150))
+          8:label(image:Grass width:1 height:1 bg:c(0 150 150))
 		   )
    Items = items(boxpoint:fun{$ Handle} label(image:BoxP borderwidth:2 relief:raised width:30 height:30 bg:c(139 69 19) handle:Handle) end 
 		 boxbonus:fun{$ Handle} label(image:BoxB borderwidth:2 relief:raised width:30 height:30 bg:c(210 105 30) handle:Handle) end 
@@ -117,6 +120,7 @@ in
 		 bonus:fun{$ Handle} label(image:Bonus height:30 width:30 handle:Handle bg:green) end 
 		 bomb:fun{$ Handle} label(image:Bomb height:30 width:30 handle:Handle bg:black) end 
 		 fire:fun{$ Handle} label(image:Fire height:40 width:40 handle:Handle bg:red) end 
+       voodoo:fun{$ Handle} label(image:Voodoo height:40 width:40 handle:Handle bg:red) end 
 		)
    
 %%%%% Function to draw the map
@@ -138,7 +142,14 @@ in
 	 end
       end
    in
-      {DrawRow Input.map 1}
+      local 
+         Map
+      in
+         if Input.useExtention then Map = Input.map1
+         else Map = Input.map
+         end
+         {DrawRow Map 1}
+      end
    end
 
    fun{PrepareMap GridHandle}
@@ -157,29 +168,35 @@ in
          [] 0|End then BombH FireH in
 	    {CreateRemove {Items.bomb BombH} M N true}
 	    {CreateRemove {Items.fire FireH} M N true}
-            Res.M.N = items(box:null bonus:null point:null bomb:BombH fire:FireH)
+            Res.M.N = items(box:null bonus:null point:null bomb:BombH fire:FireH voodoo:null)
             {PrepareColumn End M N+1}
          [] 1|End then
-            Res.M.N = items(box:null bonus:null point:null bomb:null fire:null)
+            Res.M.N = items(box:null bonus:null point:null bomb:null fire:null voodoo:null)
             {PrepareColumn End M N+1}
          [] 2|End then BoxH PointH BombH FireH  in
             {CreateRemove {Items.boxpoint BoxH} M N false}
             {CreateRemove {Items.point PointH} M N true}
 	    {CreateRemove {Items.bomb BombH} M N true}
 	    {CreateRemove {Items.fire FireH} M N true}
-            Res.M.N = items(box:BoxH bonus:null point:PointH bomb:BombH fire:FireH)
+            Res.M.N = items(box:BoxH bonus:null point:PointH bomb:BombH fire:FireH voodoo:null)
             {PrepareColumn End M N+1}
          [] 3|End then BoxH BonusH BombH FireH  in
             {CreateRemove {Items.boxbonus BoxH} M N false}
             {CreateRemove {Items.bonus BonusH} M N true}
 	    {CreateRemove {Items.bomb BombH} M N true}
 	    {CreateRemove {Items.fire FireH} M N true}
-            Res.M.N = items(box:BoxH bonus:BonusH point:null bomb:BombH fire:FireH)
+            Res.M.N = items(box:BoxH bonus:BonusH point:null bomb:BombH fire:FireH voodoo:null)
             {PrepareColumn End M N+1}
          [] 4|End then BombH FireH in
 	    {CreateRemove {Items.bomb BombH} M N true}
 	    {CreateRemove {Items.fire FireH} M N true}
-            Res.M.N = items(box:null bonus:null point:null bomb:BombH fire:FireH)
+            Res.M.N = items(box:null bonus:null point:null bomb:BombH fire:FireH voodoo:null)
+            {PrepareColumn End M N+1}
+         [] 8|End then BombH VoodooH FireH in
+            {CreateRemove {Items.bomb BombH} M N true}
+            {CreateRemove {Items.voodoo VoodooH} M N false}
+            {CreateRemove {Items.fire FireH} M N true}
+            Res.M.N = items(box:null bonus:null point:null bomb:BombH fire:FireH voodoo:VoodooH)
             {PrepareColumn End M N+1}
          end
       end
@@ -194,7 +211,14 @@ in
       end
    in
       Res = {Tuple.make items Input.nbRow} 
-      {PrepareRow Input.map 1}
+      local 
+         Map
+      in
+         if Input.useExtention then Map = Input.map1
+         else Map = Input.map
+         end
+         {PrepareRow Map 1}
+      end
       Res
    end
 %%%%% Init the Player

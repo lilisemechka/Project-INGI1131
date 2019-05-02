@@ -22,7 +22,11 @@ in
 
    {Delay 10000}
    if Input.isTurnByTurn then
-      {TurnByTurn.doActionTBT Players nil Input.map Players P_GUI}
+      if Input.useExtention then
+         {TurnByTurn.doActionTBT Players nil Input.map1 Players P_GUI}
+      else
+         {TurnByTurn.doActionTBT Players nil Input.map Players P_GUI}
+      end
    else
       {Simultaneous.launchSimul Players P_GUI}
    end
