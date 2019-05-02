@@ -1,6 +1,6 @@
 # ----------------------------
-# group nb 99
-# noma1 : Liliya Semerikova
+# group nb 55
+# 64811600 : Liliya Semerikova
 # 24601600 : Gildas Mulders
 # ----------------------------
 
@@ -23,7 +23,7 @@ all : compile run
 compile : Main.ozf GUI.ozf PlayerManager.ozf Init.ozf Utilitaries.ozf TurnByTurn.ozf Simultaneous.ozf
 
 compilePlayers : Player000name.oz
-	$(ozCompiler) -c Player000name.oz
+	$(ozCompiler) -c Player000name.oz Player001name.oz
 
 run : Main.ozf 
 	$(ozExecuter) Main.ozf

@@ -89,21 +89,21 @@ in
       handle(grid:Grid items:GridItems life:GridLife score:GridScore)
    end
 
-   Wall = {QTk.newImage photo(file:'Wall.gif' height:50 width:50)}
-   Dirt = {QTk.newImage photo(file:'Dirt.gif' height:50 width:50)}
-   Grass = {QTk.newImage photo(file:'Grass.gif' height:50 width:50)}
-   BoxP = {QTk.newImage photo(file:'BoxP.gif' height:30 width:30)}
-   BoxB = {QTk.newImage photo(file:'BoxB.gif' height:30 width:30)}
-   Bomb = {QTk.newImage photo(file:'Bomb.gif' height:30 width:30)}
-   Fire = {QTk.newImage photo(file:'Fire.gif' height:40 width:40)}
-   Bonus = {QTk.newImage photo(file:'Bonus.gif' height:30 width:30)}
-   Point = {QTk.newImage photo(file:'Point.gif' height:30 width:30)}
-   Black ={QTk.newImage photo(file:'DarkVadorBlack.gif' height:30 width:30)}
-   White = {QTk.newImage photo(file:'GandalfTheWhite.gif' height:30 width:30)}
-   Yellow = {QTk.newImage photo(file:'PacManYellow.gif' height:30 width:30)}
-   Green = {QTk.newImage photo(file:'ZeldaGreen.gif' height:30 width:30)}
-   Blue = {QTk.newImage photo(file:'SonicBlue.gif' height:30 width:30)}
-   Red = {QTk.newImage photo(file:'MarioRed.gif' height:30 width:30)}
+   Wall = {QTk.newImage photo(file:'./Images/Wall.gif' height:50 width:50)}
+   Dirt = {QTk.newImage photo(file:'./Images/Dirt.gif' height:50 width:50)}
+   Grass = {QTk.newImage photo(file:'./Images/Grass.gif' height:50 width:50)}
+   BoxP = {QTk.newImage photo(file:'./Images/BoxP.gif' height:30 width:30)}
+   BoxB = {QTk.newImage photo(file:'./Images/BoxB.gif' height:30 width:30)}
+   Bomb = {QTk.newImage photo(file:'./Images/Bomb.gif' height:30 width:30)}
+   Fire = {QTk.newImage photo(file:'./Images/Fire.gif' height:40 width:40)}
+   Bonus = {QTk.newImage photo(file:'./Images/Bonus.gif' height:30 width:30)}
+   Point = {QTk.newImage photo(file:'./Images/Point.gif' height:30 width:30)}
+   Black ={QTk.newImage photo(file:'./Images/DarkVadorBlack.gif' height:30 width:30)}
+   White = {QTk.newImage photo(file:'./Images/GandalfTheWhite.gif' height:30 width:30)}
+   Yellow = {QTk.newImage photo(file:'./Images/PacManYellow.gif' height:30 width:30)}
+   Green = {QTk.newImage photo(file:'./Images/ZeldaGreen.gif' height:30 width:30)}
+   Blue = {QTk.newImage photo(file:'./Images/SonicBlue.gif' height:30 width:30)}
+   Red = {QTk.newImage photo(file:'./Images/MarioRed.gif' height:30 width:30)}
 %%%%% Squares of path and wall
    Squares = square(0:label(image:Grass width:1 height:1 bg:c(0 0 204))
 		    1:label(image:Wall borderwidth:5 relief:raised width:1 height:1 bg:c(0 0 0))
