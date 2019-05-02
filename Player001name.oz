@@ -17,8 +17,6 @@ define
    Spawn
    Add
    GotHit
-   ChangePos
-   DeletePlayer
    ChangeMap
    Info
    IsBox
@@ -29,6 +27,10 @@ define
    DeleteFirstElem
    BonusPath
    DeleteElem
+   Move
+   BestMove
+   PositionBox
+   PositionFloor
 in
    fun{StartPlayer ID}
       Stream Port OutputStream      
@@ -43,7 +45,8 @@ in
          if Input.useExtention then Map = Input.map1
          else Map = Input.map
          end
-	     {TreatStream OutputStream bombInfo(id:ID state:off pos:nil live:Input.nbLives spawn:nil nBomb:Input.nbBombs point:0 listPlayer:nil map:Map bomb:nil bonus:nil bonusPath:pt(x:0 y:0))}
+	     {TreatStream OutputStream bombInfo(id:ID state:off pos:nil live:Input.nbLives spawn:nil nBomb:Input.nbBombs point:0 map:Map bomb:nil bonus:nil bonusPath:pt(x:0 y:0))}
+
       end
       Port
    end
@@ -102,36 +105,6 @@ in
             {AdjoinAt {AdjoinAt BombInfo state off} live NewLife}
          end
       end
-   end   
-
-   /*
-   * Update the position of the other players
-   */
-
-   fun{ChangePos ID Pos ListPlayer}
-      case ListPlayer of
-         H|T then
-            case H of player(id:ID1 pos:Pos1) then
-               if  ID1 == ID then player(id:ID1 pos:Pos)|T
-               else H|{ChangePos ID Pos T}
-               end
-            end
-         [] nil then player(id:ID pos:Pos)|nil
-      end
-   end
-
-   /*
-   * If on player is dead, delete him from the player list
-   */
-
-   fun{DeletePlayer ID ListPlayer}
-      case ListPlayer of
-         H|T then
-            if H.id == ID then T
-            else H|{DeletePlayer ID T}
-            end
-         [] nil then nil
-      end
    end
 
    /*
@@ -146,16 +119,13 @@ in
       	    elseif X > 1 then H|{NewMap T X-1 0}
       	    elseif X == 1 then
       	       if Type == deleteBox then 0|T
-                elseif Type == bomb then 5|T
                 elseif Type == deleteBomb then 0|T
       	       end
       	    end
       	 end
       end
    in
-      case Pos of pt(x:X y:Y) then
-	  {NewMap Map X Y}
-      end      
+	  {NewMap Map Pos.x Pos.y}
    end
 
    /*
@@ -222,9 +192,7 @@ in
       	 end
       end
    in
-      case Pos of pt(x:X y:Y) then
-	    {CheckMap Map X Y}
-      end 
+	    {CheckMap Map Pos.x Pos.y}
    end
 
    /*
@@ -234,51 +202,22 @@ in
    fun{Info BombInfo Message}
       case Message of
          spawnPlayer(ID Pos) then
-            if(ID == BombInfo.id) then BombInfo
-            else 
-               local NewList in
-                  NewList = {ChangePos ID Pos BombInfo.listPlayer}
-                  {AdjoinAt BombInfo listPlayer NewList}
-               end
-            end
-         [] movePlayer(ID Pos) then
-            if(ID == BombInfo.id) then BombInfo
-            else
-               local NewList in
-                  NewList = {ChangePos ID Pos BombInfo.listPlayer}
-                  {AdjoinAt BombInfo listPlayer NewList}
-               end
-            end
-         [] deadPlayer(ID) then
-            if(ID == BombInfo.id) then BombInfo
-            else 
-               local NewList in
-                  NewList = {DeletePlayer ID BombInfo.listPlayer}
-                  {AdjoinAt BombInfo listPlayer NewList}
-               end
-            end
-         [] bombPlanted(Pos) then
-            case Pos of pt(x:X1 y:Y1) then
-               case BombInfo.pos of pt(x:X2 y:Y2) then
-                  if {Abs X1-X2} =< Input.fire then 
-                     {AdjoinAt BombInfo bomb {AddElem BombInfo.bomb Pos}} 
-                  else BombInfo
-                  end
-               else BombInfo
-               end
+            BombInfo
+      [] movePlayer(ID Pos) then
+            BombInfo
+      [] deadPlayer(ID) then
+            BombInfo
+      [] bombPlanted(Pos) then
+            if {Abs Pos.x-BombInfo.pos.x} =< Input.fire then 
+               {AdjoinAt BombInfo bomb {AddElem BombInfo.bomb Pos}} 
             else BombInfo
             end
-         [] bombExploded(Pos) then
+      [] bombExploded(Pos) then
             {AdjoinAt BombInfo bomb {DeleteElem BombInfo.bomb Pos}} 
-         [] boxRemoved(Pos) then
-            case Pos of pt(x:X1 y:Y1) then
-               case BombInfo.pos of pt(x:X2 y:Y2) then
-                  if {Abs X1-X2} =< Input.fire then 
-                     {AdjoinAt {AdjoinAt BombInfo bonus {AddElem BombInfo.bonus Pos}} map {ChangeMap BombInfo.map Pos deleteBox}}
-                  else {AdjoinAt BombInfo map {ChangeMap BombInfo.map Pos deleteBox}}
-                  end
-               else {AdjoinAt BombInfo map {ChangeMap BombInfo.map Pos deleteBox}}
-               end
+      [] boxRemoved(Pos) then
+            if {Abs Pos.x-BombInfo.pos.x} =< Input.fire then 
+               {AdjoinAt {AdjoinAt BombInfo bonus {AddElem BombInfo.bonus Pos}} map {ChangeMap BombInfo.map Pos deleteBox}}
+            else {AdjoinAt BombInfo map {ChangeMap BombInfo.map Pos deleteBox}}
             end
       end
    end
@@ -456,7 +395,7 @@ in
    * Move the bomber randomly
    */
 
-    fun{Random BombInfo Bool}
+   fun{Random BombInfo Bool}
         local Result in
         Result = {OS.rand} mod 9
             if Result == 0 then 
@@ -493,6 +432,88 @@ in
     end
 
    /*
+   * Check the box cases near the bomber
+   */
+   fun{PositionBox PosList Acc}
+      case PosList of H|T then 
+         if H == 2 orelse H == 3 then 
+            Acc|{PositionBox T Acc+1}
+         else {PositionBox T Acc+1}
+         end
+      [] nil then nil
+      end
+   end
+
+   /*
+   * Check the floor cases near the bomber
+   */
+   fun{PositionFloor PosList Acc}
+      case PosList of H|T then 
+         if H == 0 orelse H == 4 then 
+            Acc|{PositionFloor T Acc+1}
+         else {PositionFloor T Acc+1}
+         end
+      [] nil then nil
+      end
+   end
+
+   /*
+   * Return the best move for the bomber
+   */
+   fun{BestMove ListFloor PrevPos}
+      case ListFloor of H|T then 
+         if H == PrevPos then
+            {BestMove T PrevPos}
+         else H
+         end
+      [] nil then PrevPos
+      else PrevPos
+      end
+   end
+
+   /*
+   * Move the bomber
+   * Il doit avancer s'il a rien à faire, pas faire les retours
+   * Poser une bombe s'il est à coté d'une mur
+   */
+   fun{Move BombInfo}
+      local PosList Up Down Left Right BoxList FloorList in
+         Up = {Nth {Nth BombInfo.map BombInfo.pos.y-1} BombInfo.pos.x}
+         Down = {Nth {Nth BombInfo.map BombInfo.pos.y+1} BombInfo.pos.x}
+         Left = {Nth {Nth BombInfo.map BombInfo.pos.y} BombInfo.pos.x-1}
+         Right = {Nth {Nth BombInfo.map BombInfo.pos.y} BombInfo.pos.x+1}
+         PosList = [Up Down Left Right]
+         BoxList = {PositionBox PosList 1}
+         FloorList = {PositionFloor PosList 1}
+         if BoxList \= nil then 
+            {System.show BombInfo.pos}
+            bomb(BombInfo.pos)
+         else 
+            local X Y Z Pos in
+               X = BombInfo.pos.x - BombInfo.bonusPath.x 
+               Y = BombInfo.pos.y - BombInfo.bonusPath.y
+               if X == 0 andthen Y == 1 then Z = 1
+               elseif X == 0 andthen Y == ~1 then Z = 2
+               elseif X == ~1 andthen Y == 0 then Z = 3
+               elseif X == 1 andthen Y == 0 then Z = 4
+               else Z = 5
+               end
+               Pos = {BestMove FloorList Z}
+               if Pos == 1 then 
+                  move(pt(x:BombInfo.pos.x y:BombInfo.pos.y-1))
+               elseif Pos == 2 then 
+                  move(pt(x:BombInfo.pos.x y:BombInfo.pos.y+1))
+               elseif Pos == 3 then 
+                  move(pt(x:BombInfo.pos.x-1 y:BombInfo.pos.y))
+               elseif Pos == 4 then 
+                  move(pt(x:BombInfo.pos.x+1 y:BombInfo.pos.y))
+               end
+            end
+         end
+      end
+   end
+
+   /*
    * Assign an action to the bomber: move or put a bomb
    * If the bomber is out of the map then assigne his action and hist ID to null
    */
@@ -511,12 +532,12 @@ in
                 end
             elseif BombInfo.bonus \= nil then 
                   Action = {BonusPath BombInfo Bl}
-            else Action = {Random BombInfo true}
+            else Action = {Move BombInfo}
             end
             case Action of move(Pos) then
                   if {IsFree Bl} then 
                      {AdjoinAt {AdjoinAt BombInfo bonusPath BombInfo.pos} pos Pos}
-                  elseif Bl == true then {AdjoinAt {AdjoinAt {AdjoinAt BombInfo bonusPath BombInfo.pos} bonus {DeleteFirstElem BombInfo.bonus}} pos Pos}
+                  elseif Bl == true then {AdjoinAt {AdjoinAt {AdjoinAt BombInfo bonusPath BombInfo.pos} bonus {DeleteElem BombInfo.bonus BombInfo.pos}} pos Pos}
                   else {AdjoinAt {AdjoinAt BombInfo bonusPath BombInfo.pos} pos Pos}
                   end
             [] bomb(Pos) then 
@@ -526,7 +547,7 @@ in
       end
     end
    
-   %% bombInfo(id:ID state:State pos:Pos live:Live spawn:Spawn nBomb:NBomb point:Point listPlayer:ListPlayer map:Map bomb:Bomb bonus:Bonus bonusPath:bonusPath) 
+   %% bombInfo(id:ID state:State pos:Pos live:Live spawn:Spawn nBomb:NBomb point:Point map:Map bomb:Bomb bonus:Bonus bonusPath:bonusPath) 
    proc{TreatStream Stream BombInfo}
       case Stream of nil then skip
       [] getId(ID)|T then 

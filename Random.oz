@@ -12,12 +12,10 @@ define
    Name = 'namefordebug'
 
    %functions
-   GetState
    Spawn
    Add
    GotHit
    ChangePos
-   DeletePlayer
    ChangeMap
    Info
    IsBox
@@ -36,7 +34,7 @@ in
          if Input.useExtention then Map = Input.map1
          else Map = Input.map
          end
-	     {TreatStream OutputStream bombInfo(id:ID state:off pos:nil live:Input.nbLives spawn:nil nBomb:Input.nbBombs point:0 listPlayer:nil map:Map) }
+	     {TreatStream OutputStream bombInfo(id:ID state:off pos:nil live:Input.nbLives spawn:nil nBomb:Input.nbBombs point:0 map:Map) }
       end
       Port
    end
@@ -93,16 +91,6 @@ in
       end
    end
 
-   fun{DeletePlayer ID ListPlayer}
-      case ListPlayer of
-         H|T then
-            if H.id == ID then T
-            else H|{DeletePlayer ID T}
-            end
-         [] nil then nil
-      end
-   end
-
    fun {ChangeMap Map Pos Type}
 
       fun{NewMap Map X Y}
@@ -127,33 +115,15 @@ in
    fun{Info BombInfo Message}
       case Message of
          spawnPlayer(ID Pos) then
-            if(ID == BombInfo.id) then BombInfo
-            else 
-               local NewList in
-                  NewList = {ChangePos ID Pos BombInfo.listPlayer}
-                  {AdjoinAt BombInfo listPlayer NewList}
-               end
-            end
+            BombInfo
          [] movePlayer(ID Pos) then
-            if(ID == BombInfo.id) then BombInfo
-            else 
-               local NewList in
-                  NewList = {ChangePos ID Pos BombInfo.listPlayer}
-                  {AdjoinAt BombInfo listPlayer NewList}
-               end
-            end
+            BombInfo
          [] deadPlayer(ID) then
-            if(ID == BombInfo.id) then BombInfo
-            else 
-               local NewList in
-                  NewList = {DeletePlayer ID BombInfo.listPlayer}
-                  {AdjoinAt BombInfo listPlayer NewList}
-               end
-            end
+            BombInfo
          [] bombPlanted(Pos) then 
-            {AdjoinAt BombInfo map {ChangeMap BombInfo.map Pos bomb}}
+            BombInfo
          [] bombExploded(Pos) then
-            {AdjoinAt BombInfo map {ChangeMap BombInfo.map Pos deleteBomb}}
+            BombInfo
          [] boxRemoved(Pos) then
             {AdjoinAt BombInfo map {ChangeMap BombInfo.map Pos deleteBox}}
       end
@@ -174,9 +144,7 @@ in
       	 end
       end
    in
-      case Pos of pt(x:X y:Y) then
-	  {CheckMap Map X Y}
-      end 
+	  {CheckMap Map Pos.x Pos.y}
    end
 
 
@@ -196,42 +164,33 @@ in
                else {DoAction BombInfo ID Action}
                end
             elseif Random == 1 then 
-               case BombInfo.pos of pt(x:X y:Y) then
-                  if {IsBox BombInfo.map pt(x:X y:(Y-1))} then {DoAction BombInfo ID Action}
-                  else Action = move(pt(x:X y:(Y-1)))
-                     {AdjoinAt BombInfo pos pt(x:X y:(Y-1))}
+                  if {IsBox BombInfo.map pt(x:BombInfo.pos.x y:BombInfo.pos.y-1)} then {DoAction BombInfo ID Action}
+                  else Action = move(pt(x:BombInfo.pos.x y:BombInfo.pos.y-1))
+                     {AdjoinAt BombInfo pos pt(x:BombInfo.pos.x y:BombInfo.pos.y-1)}
                   end
-               end
             elseif Random == 2 then 
-               case BombInfo.pos of pt(x:X y:Y) then
-                  if {IsBox BombInfo.map pt(x:X y:(Y+1))} then {DoAction BombInfo ID Action}
-                  else Action = move(pt(x:X y:(Y+1)))
-                     {AdjoinAt BombInfo pos pt(x:X y:(Y+1))}
+                  if {IsBox BombInfo.map pt(x:BombInfo.pos.x y:BombInfo.pos.y+1)} then {DoAction BombInfo ID Action}
+                  else Action = move(pt(x:BombInfo.pos.x y:BombInfo.pos.y+1))
+                     {AdjoinAt BombInfo pos pt(x:BombInfo.pos.x y:BombInfo.pos.y+1)}
                   end
-               end
             elseif Random == 3 then 
-               case BombInfo.pos of pt(x:X y:Y) then
-                  if {IsBox BombInfo.map pt(x:(X-1) y:Y)} then {DoAction BombInfo ID Action}
-                  else Action = move(pt(x:(X-1) y:Y))
-                     {AdjoinAt BombInfo pos pt(x:(X-1) y:Y)}
+                  if {IsBox BombInfo.map pt(x:BombInfo.pos.x-1 y:BombInfo.pos.y)} then {DoAction BombInfo ID Action}
+                  else Action = move(pt(x:BombInfo.pos.x-1 y:BombInfo.pos.y))
+                     {AdjoinAt BombInfo pos pt(x:BombInfo.pos.x-1 y:BombInfo.pos.y)}
                   end
-               end
             elseif Random == 4 then 
-               case BombInfo.pos of pt(x:X y:Y) then
-                  if {IsBox BombInfo.map pt(x:(X+1) y:Y)} then {DoAction BombInfo ID Action}
-                  else Action = move(pt(x:(X+1) y:Y))
-                     {AdjoinAt BombInfo pos pt(x:(X+1) y:Y)}
+                  if {IsBox BombInfo.map pt(x:BombInfo.pos.x+1 y:BombInfo.pos.y)} then {DoAction BombInfo ID Action}
+                  else Action = move(pt(x:BombInfo.pos.x+1 y:BombInfo.pos.y))
+                     {AdjoinAt BombInfo pos pt(x:BombInfo.pos.x+1 y:BombInfo.pos.y)}
                   end
-               end
             end
          end
       end
    end
    
-   proc{TreatStream Stream BombInfo} %% TODO you may add some arguments if needed
+   proc{TreatStream Stream BombInfo}
       %% BombInfo to save all the information about the bomber
-      %% BombInfo = 
-      %% bombInfo(id:ID state:State pos:Pos live:Live spawn:Spawn nBomb:NBomb point:Point listPlayer:ListPlayer map:Map) 
+      %% BombInfo = bombInfo(id:ID state:State pos:Pos live:Live spawn:Spawn nBomb:NBomb point:Point map:Map) 
 
       case Stream of nil then skip
       [] getId(ID)|T then 
