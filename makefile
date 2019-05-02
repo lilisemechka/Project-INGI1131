@@ -23,7 +23,7 @@ all : compile run
 compile : Main.ozf GUI.ozf PlayerManager.ozf Init.ozf Utilitaries.ozf TurnByTurn.ozf Simultaneous.ozf
 
 compilePlayers : Player000name.oz
-	$(ozCompiler) -c Player000name.oz
+	$(ozCompiler) -c Player000name.oz Player001name.oz
 
 run : Main.ozf 
 	$(ozExecuter) Main.ozf

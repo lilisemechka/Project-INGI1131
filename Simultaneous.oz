@@ -404,7 +404,7 @@ in
 				            {Send PBombs readMap(Map)}
 			            	Type =  {Nth {Nth Map Pos.y} Pos.x}
 			            end
-			            if Type == 5 then
+			            if Type == 5 orelse Type == 12 then
 			               	{Send P_GUI hidePoint(Pos)}
 			               	local 
 			                  	Score 
@@ -412,8 +412,12 @@ in
 			                  	{Send H.port add(point 1 Score)}
 			                  	{Send P_GUI scoreUpdate(ID Score)}
 			               	end
-			               	{Send PBombs changeMap(type:deletePoint pos:Pos)}
-			            elseif Type == 6 then
+			               	if Type == 5 then
+			               		{Send PBombs changeMap(type:deletePoint pos:Pos)}
+			               	else
+			               		{Send PBombs changeMap(type:fire pos:Pos)}
+			               	end
+			            elseif Type == 6 orelse Type == 13 then
 			               	{Send P_GUI hideBonus(Pos)}
 			               	if ({OS.rand} mod 2 ) == 0 then
 			               		Thrash
@@ -427,7 +431,11 @@ in
 			                     	{Send P_GUI scoreUpdate(ID Score)}
 			                  	end
 			               	end  
-			               	{Send PBombs changeMap(type:deleteBonus pos:Pos)}     		            	
+			               	if Type == 6 then
+			               		{Send PBombs changeMap(type:deleteBonus pos:Pos)} 
+			               	else
+			               		{Send PBombs changeMap(type:fire pos:Pos)}
+			               	end			               	    		            	
 			            end
 			        [] bomb(Pos) then
 			        	local

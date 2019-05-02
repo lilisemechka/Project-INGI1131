@@ -20,7 +20,7 @@ in
 
    Players = {Init.getPlayers P_GUI}   
 
-   {Delay 5000}
+   {Delay 10000}
    if Input.isTurnByTurn then
       {TurnByTurn.doActionTBT Players nil Input.map Players P_GUI}
    else

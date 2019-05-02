@@ -17,7 +17,6 @@ define
    	DoActionTBT
 in
 	proc{ExploLoc Pos Action Direction Acc Map NewMap Players P_GUI}
-      {Browser.browse 'exploloc'}
       if Acc == Input.fire then
          NewMap = Map
          skip
@@ -115,7 +114,6 @@ in
             end
          end
       end
-      {Browser.browse 'QUIT EXPLODE'}
    end
 
    proc{Explode Pos Action Map NewMap Players P_GUI}
@@ -127,7 +125,6 @@ in
 	 end
       end
       
-         {Browser.browse 'explode'}
          case Pos of pt(x:X y:Y) then
          {ExploLoc pt(x:X-1 y:Y) Action west 0 Map NewMap1 Players P_GUI}
 
@@ -137,13 +134,11 @@ in
 
          {ExploLoc pt(x:X y:Y-1) Action north 0 NewMap3 NewMap Players P_GUI}
       end
-      {Browser.browse 'REAL QUIT EXPLODE'}
    end
 
 
 
    fun{HandleBombs Bombs Map NewMap Players P_GUI}
-      {Browser.browse 'handleBombs'}
       case Bombs 
       of nil then
          NewMap = Map
@@ -196,8 +191,7 @@ in
 
 
    proc{DoActionTBT PlayersList Bombs Map AllPlayers P_GUI}
-      {Browser.browse 'doaction'}
-      {Delay 500}
+      {Delay 1000}
       {Browser.browse PlayersList}
       if {Utilitaries.boxCheck Map} then 
          {Send P_GUI displayWinner({Utilitaries.bestScore AllPlayers})}
@@ -223,7 +217,6 @@ in
                State
             in               
                {Send H.port getState(IDState State)}
-               {Browser.browse State}
                if State == off then 
                   local 
                      IDSpawn 
@@ -258,16 +251,29 @@ in
       	              {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap {Append T player(port:H.port pos:Pos)|nil} P_GUI} {Utilitaries.changeMap NewMap Pos deletePoint} AllPlayers P_GUI}
                      elseif Type == 6 then
                		   {Send P_GUI hideBonus(Pos)}
-                        if ({OS.rand} mod 2 ) == 0 then
-                           Thrash 
-                           in
-               		      {Send H.port add(bomb 1 Thrash)}
-                        else
-                           local 
-                              Score 
-                           in
-                             {Send H.port add(point 10 Score)}
-                             {Send P_GUI scoreUpdate(ID Score)}
+                        local 
+                           Bonuses
+                           Rand
+                           Res
+                        in
+                           if Input.useExtention then Bonuses = 3
+                           else Bonuses = 2
+                           end
+                           Rand = ({OS.rand} mod Bonuses )
+                           if Rand == 0 then
+                              Thrash 
+                              in
+                  		      {Send H.port add(bomb 1 Thrash)}
+                           elseif Rand == 2 then
+                              {Send H.port add(life 1 Res)}
+                              {Send P_GUI lifeUpdate(ID Res)}
+                           else
+                              local 
+                                 Score 
+                              in
+                                {Send H.port add(point 10 Score)}
+                                {Send P_GUI scoreUpdate(ID Score)}
+                              end
                            end
                         end
                		   {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs Map NewMap {Append T player(port:H.port pos:Pos)|nil} P_GUI} {Utilitaries.changeMap NewMap Pos deleteBonus} AllPlayers P_GUI}                   
