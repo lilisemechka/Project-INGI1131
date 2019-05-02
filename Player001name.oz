@@ -29,6 +29,10 @@ define
    DeleteFirstElem
    BonusPath
    DeleteElem
+   Move
+   BestMove
+   PositionBox
+   PositionFloor
 in
    fun{StartPlayer ID}
       Stream Port OutputStream      
@@ -141,7 +145,6 @@ in
       	    elseif X > 1 then H|{NewMap T X-1 0}
       	    elseif X == 1 then
       	       if Type == deleteBox then 0|T
-                elseif Type == bomb then 5|T
                 elseif Type == deleteBomb then 0|T
       	       end
       	    end
@@ -451,7 +454,7 @@ in
    * Move the bomber randomly
    */
 
-    fun{Random BombInfo Bool}
+   fun{Random BombInfo Bool}
         local Result in
         Result = {OS.rand} mod 9
             if Result == 0 then 
@@ -488,6 +491,106 @@ in
     end
 
    /*
+   * Check the box cases near the bomber
+   */
+   fun{PositionBox PosList Acc}
+      case PosList of H|T then 
+         if H == 2 orelse H == 3 then 
+            Acc|{PositionBox T Acc+1}
+         else {PositionBox T Acc+1}
+         end
+      [] nil then nil
+      end
+   end
+
+   /*
+   * Check the floor cases near the bomber
+   */
+   fun{PositionFloor PosList Acc}
+      case PosList of H|T then 
+         if H == 0 orelse H == 4 then 
+            Acc|{PositionFloor T Acc+1}
+         else {PositionFloor T Acc+1}
+         end
+      [] nil then nil
+      end
+   end
+
+   /*
+   * Return the best move for the bomber
+   */
+   fun{BestMove ListFloor PrevPos}
+      case ListFloor of H|T then 
+         if H == PrevPos then
+            {BestMove T PrevPos}
+         else H
+         end
+      [] nil then PrevPos
+      else PrevPos
+      end
+   end
+
+   /*
+   * Move the bomber
+   * Il doit avancer s'il a rien à faire, pas faire les retours
+   * Poser une bombe s'il est à coté d'une mur
+   */
+   fun{Move BombInfo}
+      local PosList Up Down Left Right BoxList FloorList in
+         {System.show 'Hello'}
+         {System.show BombInfo.map}
+         {System.show BombInfo.pos.y-1}
+         {System.show BombInfo.pos.x+1}
+         {System.show BombInfo.pos.y+1}
+         {System.show BombInfo.pos.x-1}
+         {System.show 'Bye'}
+         Up = {Nth {Nth BombInfo.map BombInfo.pos.y-1} BombInfo.pos.x}
+         {System.show Up}
+         Down = {Nth {Nth BombInfo.map BombInfo.pos.y+1} BombInfo.pos.x}
+         {System.show Down}
+         Left = {Nth {Nth BombInfo.map BombInfo.pos.y} BombInfo.pos.x-1}
+         {System.show Left}
+         Right = {Nth {Nth BombInfo.map BombInfo.pos.y} BombInfo.pos.x+1}
+         {System.show Right}
+         PosList = [Up Down Left Right]
+         {System.show PosList}
+         BoxList = {PositionBox PosList 1}
+         {System.show BoxList}
+         FloorList = {PositionFloor PosList 1}
+         {System.show FloorList}
+         if BoxList \= nil then 
+            {System.show BombInfo.pos}
+            bomb(BombInfo.pos)
+         else 
+            local X Y Z Pos in
+               X = BombInfo.pos.x - BombInfo.bonusPath.x 
+               Y = BombInfo.pos.y - BombInfo.bonusPath.y
+               if X == 0 andthen Y == 1 then Z = 1
+               elseif X == 0 andthen Y == ~1 then Z = 2
+               elseif X == ~1 andthen Y == 0 then Z = 3
+               elseif X == 1 andthen Y == 0 then Z = 4
+               else Z = 5
+               end
+               Pos = {BestMove FloorList Z}
+               if Pos == 1 then 
+                  {System.show pt(x:BombInfo.pos.x y:BombInfo.pos.y-1)}
+                  move(pt(x:BombInfo.pos.x y:BombInfo.pos.y-1))
+               elseif Pos == 2 then 
+                  {System.show pt(x:BombInfo.pos.x y:BombInfo.pos.y+1)}
+                  move(pt(x:BombInfo.pos.x y:BombInfo.pos.y+1))
+               elseif Pos == 3 then 
+                  {System.show pt(x:BombInfo.pos.x-1 y:BombInfo.pos.y)}
+                  move(pt(x:BombInfo.pos.x-1 y:BombInfo.pos.y))
+               elseif Pos == 4 then 
+                  {System.show pt(x:BombInfo.pos.x+1 y:BombInfo.pos.y)}
+                  move(pt(x:BombInfo.pos.x+1 y:BombInfo.pos.y))
+               end
+            end
+         end
+      end
+   end
+
+   /*
    * Assign an action to the bomber: move or put a bomb
    * If the bomber is out of the map then assigne his action and hist ID to null
    */
@@ -506,12 +609,12 @@ in
                 end
             elseif BombInfo.bonus \= nil then 
                   Action = {BonusPath BombInfo Bl}
-            else Action = {Random BombInfo true}
+            else Action = {Move BombInfo}
             end
             case Action of move(Pos) then
                   if {IsFree Bl} then 
                      {AdjoinAt {AdjoinAt BombInfo bonusPath BombInfo.pos} pos Pos}
-                  elseif Bl == true then {AdjoinAt {AdjoinAt {AdjoinAt BombInfo bonusPath BombInfo.pos} bonus {DeleteFirstElem BombInfo.bonus}} pos Pos}
+                  elseif Bl == true then {AdjoinAt {AdjoinAt {AdjoinAt BombInfo bonusPath BombInfo.pos} bonus {DeleteElem BombInfo.bonus BombInfo.pos}} pos Pos}
                   else {AdjoinAt {AdjoinAt BombInfo bonusPath BombInfo.pos} pos Pos}
                   end
             [] bomb(Pos) then 
