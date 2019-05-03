@@ -295,7 +295,8 @@ in
                            end
                         end
                		   {DoActionTBT {Append T player(port:H.port pos:Pos)|nil} {HandleBombs Bombs {Utilitaries.changeMap Map Pos deleteBonus} NewMap {Append T player(port:H.port pos:Pos)|nil} P_GUI} NewMap AllPlayers P_GUI}                   
-      	            elseif Type == 8 then                        
+      	            elseif Type == 8 then 
+                        {Send P_GUI hideVoodoo(Pos)}                       
                         for E in T do
                            IDead
                            Lives
