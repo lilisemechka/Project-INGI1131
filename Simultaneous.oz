@@ -53,7 +53,6 @@ in
 	end
 
 	proc{ExploLoc Pos Action Direction Acc PBombs Players P_GUI End}
-      	{Browser.browse 'exploloc'}
       	if Acc == Input.fire then
          	End = 1
       	else      
@@ -148,7 +147,6 @@ in
             		end
          		end
       		end
-      		{Browser.browse 'QUIT EXPLODE'}
       	end
    	end
 

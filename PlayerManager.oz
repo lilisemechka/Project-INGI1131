@@ -1,8 +1,8 @@
 functor
 import
    Player000bomber
-   Random
-   Player001name
+   Player055Random
+   Player055Clever
    %% Add here the name of the functor of a player
    %% Player000name
 export
@@ -15,8 +15,8 @@ in
       of player000bomber then {Player000bomber.portPlayer ID}
       %% Add here the pattern to recognize the name used in the 
       %% input file and launch the portPlayer function from the functor
-      [] random then {Random.portPlayer ID}
-      [] player001name then {Player001name.portPlayer ID}
+      [] player055random then {Player055Random.portPlayer ID}
+      [] player055clever then {Player055Clever.portPlayer ID}
       else
          raise 
             unknownedPlayer('Player not recognized by the PlayerManager '#Kind)

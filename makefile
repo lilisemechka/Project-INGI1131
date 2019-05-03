@@ -22,8 +22,8 @@ all : compile run
 
 compile : Main.ozf GUI.ozf PlayerManager.ozf Init.ozf Utilitaries.ozf TurnByTurn.ozf Simultaneous.ozf
 
-compilePlayers : Random.oz Player001name.oz
-	$(ozCompiler) -c Random.oz Player001name.oz
+compilePlayers : Player055Random.oz Player055Clever.oz
+	$(ozCompiler) -c Player055Random.oz Player055Clever.oz
 
 run : Main.ozf 
 	$(ozExecuter) Main.ozf

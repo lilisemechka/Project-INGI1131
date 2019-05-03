@@ -39,10 +39,7 @@ in
                NewMap = Map
                skip
             else
-               Type =  {Nth {Nth Map Pos.y-1} Pos.x-1}
-               {Browser.browse Type}
-               {Browser.browse Pos}
-               
+               Type =  {Nth {Nth Map Pos.y-1} Pos.x-1}               
                if Type \= 1 then
                   case Action
                   of spawnFire then               
@@ -191,7 +188,7 @@ in
                         end
                      end
                   end
-                  {Explode Pos spawnFire {Utilitaries.changeMap Map Pos fire} NewIntMap Players P_GUI}                  
+                  {Explode Pos spawnFire Map NewIntMap Players P_GUI}                  
                   bomb(pos:Pos timer:NewTicTac port:P)|{HandleBombs T NewIntMap NewMap Players P_GUI}
                   
                elseif TicTac == ~1 then 
@@ -199,7 +196,7 @@ in
                      {Send P add(bomb 1 NbBombs)}
                   end
                   {Send P_GUI hideFire(Pos)}
-                  {Explode Pos hideFire {Utilitaries.changeMap Map Pos deleteFire} NewIntMap Players P_GUI}
+                  {Explode Pos hideFire Map NewIntMap Players P_GUI}
                   {HandleBombs T NewIntMap NewMap Players P_GUI}                  
                else
                   NewIntMap = Map
