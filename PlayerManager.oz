@@ -3,7 +3,6 @@ import
    Player000bomber
    Random
    Player001name
-   Player105Cerbere
    %% Add here the name of the functor of a player
    %% Player000name
 export
@@ -18,7 +17,6 @@ in
       %% input file and launch the portPlayer function from the functor
       [] random then {Random.portPlayer ID}
       [] player001name then {Player001name.portPlayer ID}
-      [] player105cerbere then {Player105Cerbere.portPlayer ID}
       else
          raise 
             unknownedPlayer('Player not recognized by the PlayerManager '#Kind)
