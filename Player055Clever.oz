@@ -518,6 +518,10 @@ in
       end
    end
 
+   /*
+   * Choose the nearest point/bonus to take
+   */
+
    fun{ChooseBestPoint BonusList Pos}
       local MinD MinDist in
 	      fun{MinDist BonusList Pos Dist Min}
@@ -538,6 +542,7 @@ in
 	      {MinDist BonusList Pos MinD BonusList.1}
       end
    end
+   
 
    /*
    * Assign an action to the bomber: move or put a bomb
