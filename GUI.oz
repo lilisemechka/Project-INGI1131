@@ -374,6 +374,9 @@ in
 	    {TreatStream T Grid Players}
          [] displayWinner(ID) then
 	    {Browser.browse 'the winner is '#ID}
+         [] hideVoodoo(Pos) then
+            {ApplyTo Grid Pos voodoo Hide}
+         {TreatStream T Grid Players}  
          else
 	    {Browser.browse 'unsupported message'#H}
 	    {TreatStream T Grid Players}
