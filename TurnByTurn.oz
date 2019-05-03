@@ -210,7 +210,6 @@ in
 
    proc{DoActionTBT PlayersList Bombs Map AllPlayers P_GUI}
       {Delay 1000}
-      {Browser.browse PlayersList}
       if {Utilitaries.boxCheck Map} then 
          {Send P_GUI displayWinner({Utilitaries.bestScore AllPlayers})}
          {Delay 10000}
