@@ -31,6 +31,7 @@ define
    BestMove
    PositionBox
    PositionFloor
+   ChooseBestPoint
 in
    fun{StartPlayer ID}
       Stream Port OutputStream      
@@ -216,10 +217,10 @@ in
       [] bombExploded(Pos) then
             {AdjoinAt BombInfo bomb {DeleteElem BombInfo.bomb Pos}} 
       [] boxRemoved(Pos) then
-            if {Abs Pos.x-BombInfo.pos.x} =< Input.fire then 
+            %if {Abs Pos.x-BombInfo.pos.x} =< Input.fire then 
                {AdjoinAt {AdjoinAt BombInfo bonus {AddElem BombInfo.bonus Pos}} map {ChangeMap BombInfo.map Pos deleteBox}}
-            else {AdjoinAt BombInfo map {ChangeMap BombInfo.map Pos deleteBox}}
-            end
+            %else {AdjoinAt BombInfo map {ChangeMap BombInfo.map Pos deleteBox}}
+            %end
       else BombInfo   
       end
    end
@@ -302,11 +303,14 @@ in
    * Move the bomber according to the bonus position
    */
 
-   fun{BonusPath BombInfo Bool}
-      case BombInfo.bonus of H|T then 
-         case H of pt(x:X1 y:Y1) then
+   fun{BonusPath BombInfo Bool Point}
+      {System.show 'BonusPath'}
+      case Point of pt(x:X1 y:Y1) then
+         {System.show Point}
 		            case BombInfo.pos of pt(x:X2 y:Y2) then
+                        {System.show BombInfo.pos}
                      case BombInfo.bonusPath of pt(x:X3 y:Y3) then
+                        {System.show BombInfo.bonusPath}
 		               if X1 == X2 andthen Y1 == Y2 then
                         Bool = true
                         {Random BombInfo Bool}
@@ -390,7 +394,6 @@ in
                   end
 		        end
          end
-      end
    end
 
    /*
@@ -515,6 +518,27 @@ in
       end
    end
 
+   fun{ChooseBestPoint BonusList Pos}
+      local MinD MinDist in
+	      fun{MinDist BonusList Pos Dist Min}
+	         case BonusList of H|T then
+	            local DistMin in
+	               DistMin = {Abs (H.x - Pos.x)} + {Abs (H.y - Pos.y)}
+	               if DistMin < Dist then 
+                     {System.show H}
+                     {MinDist T Pos DistMin H}
+	               else {MinDist T Pos Dist Min}
+	               end
+	            end
+	         [] nil then Min
+	         end
+         end
+	      MinD = {Abs (BonusList.1.x - Pos.x)} + {Abs (BonusList.1.y - Pos.y)}
+         {System.show MinD}
+	      {MinDist BonusList Pos MinD BonusList.1}
+      end
+   end
+
    /*
    * Assign an action to the bomber: move or put a bomb
    * If the bomber is out of the map then assigne his action and hist ID to null
@@ -533,8 +557,12 @@ in
                     Action = {AvoidBombs BombInfo Bool}
                 end
             elseif BombInfo.bonus \= nil then 
+               local Point in
                   {System.show BombInfo.bonus}
-                  Action = {BonusPath BombInfo Bl}
+                  Point = {ChooseBestPoint BombInfo.bonus BombInfo.pos}
+                  {System.show Point}
+                  Action = {BonusPath BombInfo Bl Point}
+               end
             else Action = {Move BombInfo}
             end
             case Action of move(Pos) then
