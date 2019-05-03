@@ -84,6 +84,7 @@ in
             Result = BombInfo.live+Option
             {AdjoinAt BombInfo live Result}
          [] shield then BombInfo
+      else BombInfo
       end
    end
 
@@ -219,6 +220,7 @@ in
                {AdjoinAt {AdjoinAt BombInfo bonus {AddElem BombInfo.bonus Pos}} map {ChangeMap BombInfo.map Pos deleteBox}}
             else {AdjoinAt BombInfo map {ChangeMap BombInfo.map Pos deleteBox}}
             end
+      else BombInfo   
       end
    end
 
@@ -531,6 +533,7 @@ in
                     Action = {AvoidBombs BombInfo Bool}
                 end
             elseif BombInfo.bonus \= nil then 
+                  {System.show BombInfo.bonus}
                   Action = {BonusPath BombInfo Bl}
             else Action = {Move BombInfo}
             end
@@ -569,6 +572,7 @@ in
          {TreatStream T {GotHit BombInfo ID Result}}
       [] info(Message)|T then 
          {TreatStream T {Info BombInfo Message}}
+      else {TreatStream Stream BombInfo}
       end
    end
    
