@@ -3,6 +3,7 @@ import
    Player000bomber
    Player055Random
    Player055Clever
+   Player055survivor
 
    Player001Turing
    Player016Intel
@@ -23,6 +24,7 @@ in
       %% input file and launch the portPlayer function from the functor
       [] player055random then {Player055Random.portPlayer ID}
       [] player055clever then {Player055Clever.portPlayer ID}
+      [] player055survivor then {Player055survivor.portPlayer ID}
       [] player001turing then {Player001Turing.portPlayer ID}
       [] player016intel then {Player016Intel.portPlayer ID}
       [] player033ai then {Player033AI.portPlayer ID}

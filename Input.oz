@@ -59,7 +59,7 @@ in
 %%%% Players description %%%%
 
    NbBombers = 3
-   Bombers = [player055random player055clever player000bomber]
+   Bombers = [player055random player055clever player055survivor]
    ColorBombers = [green red black]
 
 %%%% Parameters %%%%

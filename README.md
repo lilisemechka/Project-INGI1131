@@ -1,6 +1,5 @@
 # OZ2
 
 
-TODO : 
-
-Randomize list of players
+In Input, UseExtention can only be set to true when TurnByTurn is also true ! 
+Type "make" to compile and run. 
