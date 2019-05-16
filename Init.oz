@@ -51,13 +51,13 @@ in
    	fun{AssignSpawns Players AvailSpawns Spawns}
       	local ActualSpawns
       	in
-         	if AvailSpawns == nil then ActualSpawns = Spawns
+         	case AvailSpawns of nil then ActualSpawns = Spawns
          	else ActualSpawns = AvailSpawns
          	end
          	case Players of nil then nil
          	[] H|T then         
-            	{Send H assignSpawn(AvailSpawns.1)}            
-            	player(port:H pos:AvailSpawns.1)|{AssignSpawns T AvailSpawns.2 Spawns}
+            	{Send H assignSpawn(ActualSpawns.1)}            
+            	player(port:H pos:ActualSpawns.1)|{AssignSpawns T ActualSpawns.2 Spawns}
          	end         
       	end
    	end
